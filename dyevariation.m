@@ -1,37 +1,40 @@
 
-rho110info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\rho110info.txt');
-rhobinfo = readtable('C:\Users\hwilson23\Documents\UserDataOWS\rhoBinfo.txt');
+info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\scrambleddataforcodetesting.txt');
+gitupload = 'yes';
 
-filenames = table2array([rho110info(:,5) rhobinfo(:,2)]);
-binnums = table2array([rho110info(:,11) rhobinfo(:,4)]);
-[numfile, samples] = size(filenames);
+filenames = info.ImageFile; %change to equal correct title
+fludye = info.FluorescentDye;
+day = info.Day;
+roi = info.ROI;
+laserpower = info.LaserPower;
+binnums = info.BinNumber;
+
+
+[numfile, infocat] = size(info);
+dayvalues = unique(day);
+fluvalue = unique(fludye);
+
 add = 0;
-data = [];
-for a = 1:samples
-    for b = 1:numfile
-        
-        file = filenames(b,a);
-        binnum = binnums(b,a);
-        [imtitle, average, stdev, variation] = getdata(char(file), binnum);
-        data = [data; string(imtitle), string(average), string(stdev), string(variation)];
-        
-        add = add+1;
-        data;
-    end 
-        
+data = ["FileName", "Mean", "StandardDeviation", "CoeffOfVariation"];
+close all;
+
+%gets data, no histogram function
+for a = 1:numfile
+    
+    file = filenames(a,end);
+    binnum = binnums(a,end);
+    [imtitle, average, stdev, variation] = getdata(char(file), binnum);
+    data = [data; string(imtitle), string(average), string(stdev), string(variation)];
+
+    add = add+1;
+    data;
+    
 end 
 add;
 data
 
-%{
-figure(3)
-[rho110row, rho110col] = size(rho110info);
-scatter(rho110info(:,5), double(data(rho110row,2)), 'filled');
-errorbar(double(average(rho110row,2)));
-%}
 
-
-function [imagefile, covmean, covsd, cov] = getdata(imagefile, bin)
+function [imagefile, covmean, covsd, cov, ccvals] = getdata(imagefile, bin)
 intensityname = strcat('C:\Users\hwilson23\Documents\UserDataOWS\20220816_analysis\', imagefile, '_intensity_image.tif');
 colorname = strcat('C:\Users\hwilson23\Documents\UserDataOWS\20220816_analysis\', imagefile, '_colorcodedvalue.tif');
 
@@ -52,10 +55,15 @@ intensity = intensity{1}{1};
 
 %flip intensity image to match color coded SPCImage output
 flipped = flip(intensity);
-imagesc(flipped);
+
+figure()
+subplot(3,2,1), imagesc(flipped);
+axis image
+colorbar();
+title('flipped intensity image');
 
 %bin options
-bin2 = [5, 5];
+bin2 = [5, 5]; % 2n+1
 bin3 = [7, 7];
 bin5 = [11, 11];
 bin6 = [13, 13];
@@ -63,23 +71,22 @@ bin8 = [17, 17];
 
 usebin = strcat('bin',string(binval));
 
-if usebin == 'bin2'
+if strcmpi(usebin,'bin2')== 1
     insertbin = bin2;
-elseif usebin == 'bin3'
+elseif strcmpi(usebin,'bin3')== 1
     insertbin = bin3;
-elseif usebin == 'bin5'
+elseif strcmpi(usebin,'bin5')== 1
     insertbin = bin5;
-elseif usebin == 'bin6'
+elseif strcmpi(usebin,'bin6')== 1
     insertbin = bin6;
-elseif usebin == 'bin8'
+elseif strcmpi(usebin,'bin8')== 1
     insertbin = bin8;
 else 
     insertbin = 'bin option error'
 end
+
 %spatial binning approximation 
 binned = medfilt2(flipped, insertbin);
-imagesc(binned);
-colorbar();
 
 %segment image 
 segmented = binned; 
@@ -87,17 +94,16 @@ segmented(segmented > prctile(binned,80,'all')) = 0;
 segmented(segmented < prctile(binned,20,'all')) = 0;
 
 %set color bar limits
-colortop = max(max(binned));
+colortop = max(max(binned)); %based on max documentation
 colorbtm = min(min(binned));
 caxis manual;
 caxis([colorbtm colortop])
 
-figure(1)
-subplot(3,1,1), imagesc(binned);
+subplot(3,2,3), imagesc(binned);
 axis image
 title('binned intensity image')
 colorbar;
-subplot(3,1,2), imagesc(segmented);
+subplot(3,2,5), imagesc(segmented);
 axis image
 title('segmented intensity image')
 caxis manual;
@@ -106,9 +112,9 @@ colorbar;
 
 %create mask
 mask = segmented;
-subplot(3,1,3)
+
 mask(mask > 0) = 1;
-imagesc(mask)
+subplot(3,2,2), imagesc(mask)
 axis image
 title('mask of intensity image')
 colorbar;
@@ -117,8 +123,7 @@ colorbar;
 colorfile = bfopen(colorcodedfile);
 colorfile = colorfile{1}{1};
 
-figure(2)
-subplot(2,1,1), imagesc(colorfile);
+subplot(3,2,4), imagesc(colorfile);
 axis image
 title('original color coded value image')
 top2 = max(max(colorfile));
@@ -132,7 +137,7 @@ mask = double(mask);
 
 %apply mask of intensity image to color coded image
 colorseg = colorfile.*mask;
-subplot(2,1,2), imagesc(colorseg);
+subplot(3,2,6), imagesc(colorseg);
 axis image
 title('color coded image with mask')
 caxis manual;
