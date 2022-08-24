@@ -1,8 +1,8 @@
 
-info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\scrambleddataforcodetesting.txt');
+info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\20220816_analysis\combineddata.txt');
 gitupload = 'yes';
 
-doyouwantimages = 1;    % 1 = yes display image, 0 = no
+doyouwantimages = 0;    % 1 = yes display image, 0 = no
 doyouwanthistograms = 1;    % 1 = yes display histograms, 0 = no
 
 filenames = info.ImageFile; %change to equal correct title
@@ -56,9 +56,6 @@ end
 
 
 
-
-
-
 function gethist(allinfo)
 [numfile, ~] = size(allinfo);
 dayvalue = unique(allinfo(:,3));
@@ -72,28 +69,61 @@ sanity = [];
 for g = 1:height(fluvalue)
     for h = 1:height(dayvalue)
         for i = 1:height(roivalue)
-            figure()
+            
             someinfo = allinfo;
             separateflus = someinfo(someinfo.FluorescentDye == fluvalue.FluorescentDye(g),:);
             separatedays = separateflus(double(separateflus.Day) == double(dayvalue.Day(h)),:);
             separaterois = separatedays(separatedays.ROI == roivalue.ROI(i),:);            
             
-            sanity = separaterois.FileName;
-
-           %create plot 
-               for j = 1:height(cell2table(sanity))
+            sanityflus = separateflus.FileName;
+            sanitydays = separatedays.FileName;
+            sanityrois = separaterois.FileName;
+           
+            figure()
+           %create plot separated by day, dye, and ROI
+               for j = 1:height(cell2table(sanityrois))
                 
                 histogram(cell2mat(separaterois.HistogramData(j)),100,'FaceAlpha',0.4,'EdgeColor','none');
 
-                title(strcat(' Day ',string(h), ' Fluorescent Dye ', string(g),' ROI ',string(i)));
+                title(strcat(' Fluorescent Dye ', string(g), ' Day ',string(h),' ROI ',string(i)));
                 hold on 
                end
+               hold off
+            
 			   
-           legend(sanity,'Location','bestoutside');
-           sanity = [];
+           legend(sanityrois,'Location','bestoutside'); 
+            
+           
+           sanityrois = [];
            
         end
+
+            figure()
+            %create plot separated by day and dye only
+            for k = 1:height(cell2table(sanitydays))
+                
+                histogram(cell2mat(separatedays.HistogramData(k)),100,'FaceAlpha',0.4,'EdgeColor','none');
+
+                title(strcat(' Fluorescent Dye ', string(g),' Day ',string(h) ,' All ROIs'));
+                hold on 
+               end
+			   hold off
+           legend(sanitydays,'Location','bestoutside');
+             sanitydays = [];
     end
+
+    figure()
+            %create plot separated by dye only
+            for l = 1:height(cell2table(sanityflus))
+                
+                histogram(cell2mat(separateflus.HistogramData(l)),100,'FaceAlpha',0.4,'EdgeColor','none');
+
+                title(strcat(' Fluorescent Dye ', string(g),' All Days ',' All ROIs'));
+                hold on 
+               end
+			   hold off
+           legend(sanityflus,'Location','bestoutside');
+             sanityflus = [];
 end
 
 
@@ -275,7 +305,7 @@ if imdis == 1
         imageprint = ('images displayed');
         
     elseif imdis == 0
-        imageprint = ('doyouwantimage = 0, no histogram display');
+        imageprint = ('doyouwantimage = 0, no image display');
     else
         imageprint = ('doyouwantimage ERROR');
 end 
