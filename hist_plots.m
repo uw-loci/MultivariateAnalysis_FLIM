@@ -1,11 +1,15 @@
 
-info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\20220816_analysis\combineddata.txt');
+folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220824_analysis';
+textfilename = 'bothdyesfor22and23.txt';
 gitupload = 'yes';
+
+info = readtable(strcat(folderlocation, '\', textfilename));
+
 
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
 doyouwanthistograms = 1;    % 1 = yes display histograms, 0 = no
 
-filenames = info.ImageFile; %change to equal correct title
+filenames = info.ImageFile; 
 fludye = info.FluorescentDye;
 day = info.Day;
 roi = info.ROI;
@@ -31,7 +35,7 @@ for a = 1:numfile
     file = filenames(a,end);
     binnum = binnums(a,end);
 
-    [imtitle, average, stdev, variation, histdata, imgmessage] = getdata(char(file), binnum, doyouwantimages);
+    [imtitle, average, stdev, variation, histdata, imgmessage] = getdata(char(file), folderlocation, binnum, doyouwantimages);
     data = [data; string(imtitle), string(average), string(stdev), string(variation)];
 
     histtable(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), binnums(a), histdata};
@@ -86,12 +90,13 @@ for g = 1:height(fluvalue)
                 histogram(cell2mat(separaterois.HistogramData(j)),100,'FaceAlpha',0.4,'EdgeColor','none');
 
                 title(strcat(' Fluorescent Dye ', string(g), ' Day ',string(h),' ROI ',string(i)));
-                hold on 
+               hold on 
                end
                hold off
             
 			   
-           legend(sanityrois,'Location','bestoutside'); 
+           legrois = legend(sanityrois,'Location','bestoutside','FontSize',6,'NumColumns',1); 
+           title(legrois, strcat('Number of files:  ', string(height(cell2table(sanityrois)))));
             
            
            sanityrois = [];
@@ -108,7 +113,9 @@ for g = 1:height(fluvalue)
                 hold on 
                end
 			   hold off
-           legend(sanitydays,'Location','bestoutside');
+           
+           legdays = legend(sanitydays,'Location','bestoutside','FontSize',6,'NumColumns',3); 
+           title(legdays, strcat('Number of files:  ', string(height(cell2table(sanitydays)))));
              sanitydays = [];
     end
 
@@ -122,7 +129,9 @@ for g = 1:height(fluvalue)
                 hold on 
                end
 			   hold off
-           legend(sanityflus,'Location','bestoutside');
+               legflus = legend(sanityflus,'Location','bestoutside','FontSize',6,'NumColumns',3); 
+               title(legflus, strcat('Number of files:  ', string(height(cell2table(sanityflus)))));
+           
              sanityflus = [];
 end
 
@@ -163,9 +172,11 @@ end
 
 
 
-function  [imagefile, covmean, covsd, cov, ccvals, imprint] = getdata(imagefile, bin, imagetoggle)
-intensityname = strcat('C:\Users\hwilson23\Documents\UserDataOWS\20220816_analysis\', imagefile, '_intensity_image.tif');
-colorname = strcat('C:\Users\hwilson23\Documents\UserDataOWS\20220816_analysis\', imagefile, '_colorcodedvalue.tif');
+function  [imagefile, covmean, covsd, cov, ccvals, imprint] = getdata(imagefile, location, bin, imagetoggle)
+intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
+%IMPORTANT: filename in folder should have no spaces, use gitbash and asc
+%to tif file to change SPCImage output
+colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif');   
 
 [ccvals, imprint] = getcoloravg(intensityname, colorname, bin, imagetoggle);
 
@@ -178,7 +189,6 @@ end
 
 function [pixelvals, imageprint] = getcoloravg(intensityfile, colorcodedfile, binval, imdis) 
 
-
 %get intensity image
 intensity = bfopen(intensityfile);
 intensity = intensity{1}{1};
@@ -187,34 +197,16 @@ intensity = intensity{1}{1};
 flipped = flip(intensity);
 
 %bin options
-bin2 = [5, 5]; % 2n+1
-bin3 = [7, 7];
-bin5 = [11, 11];
-bin6 = [13, 13];
-bin8 = [17, 17];
 
-usebin = strcat('bin',string(binval));
+    insertbin = [((2*binval)+1), ((2*binval)+1)]; %2n+1 matrix
 
-if strcmpi(usebin,'bin2')== 1
-    insertbin = bin2;
-elseif strcmpi(usebin,'bin3')== 1
-    insertbin = bin3;
-elseif strcmpi(usebin,'bin5')== 1
-    insertbin = bin5;
-elseif strcmpi(usebin,'bin6')== 1
-    insertbin = bin6;
-elseif strcmpi(usebin,'bin8')== 1
-    insertbin = bin8;
-else 
-    insertbin = 'bin option error';
-end
 
 %spatial binning approximation 
 binned = medfilt2(flipped, insertbin);
 
 %segment image 
 segmented = binned; 
-segmented(segmented > prctile(binned,80,'all')) = 0;
+segmented(segmented > prctile(binned,80,'all')) = 0; %orig 80,20
 segmented(segmented < prctile(binned,20,'all')) = 0;
 
 %create mask
