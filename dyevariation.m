@@ -1,6 +1,5 @@
 
 info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\scrambleddataforcodetesting.txt');
-gitupload = 'not yet';
 
 filenames = info.ImageFile;
 fludye = info.FluorescentDye;

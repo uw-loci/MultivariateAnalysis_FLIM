@@ -1,7 +1,6 @@
 
 folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220824_analysis';
 textfilename = 'bothdyesfor22and23.txt';
-gitupload = 'no';
 
 info = readtable(strcat(folderlocation, '\', textfilename));
 
