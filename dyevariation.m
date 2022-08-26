@@ -1,8 +1,8 @@
 
 info = readtable('C:\Users\hwilson23\Documents\UserDataOWS\scrambleddataforcodetesting.txt');
-gitupload = 'yes';
+gitupload = 'not yet';
 
-filenames = info.ImageFile; %change to equal correct title
+filenames = info.ImageFile;
 fludye = info.FluorescentDye;
 day = info.Day;
 roi = info.ROI;
