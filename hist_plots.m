@@ -1,13 +1,14 @@
 
 folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220824_analysis';
 textfilename = 'bothdyesfor22and23.txt';
-gitupload = 'yes';
+gitupload = 'no';
 
 info = readtable(strcat(folderlocation, '\', textfilename));
 
 
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
-doyouwanthistograms = 1;    % 1 = yes display histograms, 0 = no
+doyouwanthistograms = 0;    % 1 = yes display histograms, 0 = no
+doyouwantgrouphist = 0; % 1 = yes display grouped histograms, 0 = no
 
 filenames = info.ImageFile; 
 fludye = info.FluorescentDye;
@@ -42,21 +43,34 @@ for a = 1:numfile
     add = add+1;
     data;
 end 
+
+
         
 add;
 data
 histtable
 disp(imgmessage)
 
-%get histograms
+%get separated histograms
 if doyouwanthistograms == 1
-    gethist(histtable) %add toggle
+    gethist(histtable) 
     disp('histograms displayed')
 elseif doyouwanthistograms == 0
     disp('doyouwanthistogram = 0, no histogram display')
 else
     disp('doyouwanthistogram ERROR')
 end 
+
+%get grouped histograms
+if doyouwantgrouphist == 1
+    getpopulationhist(histtable)  
+    disp('group histogram displayed')
+elseif doyouwanthistograms == 0
+    disp('doyouwanthistogram = 0, no group histogram display')
+else
+    disp('doyouwantgrouphist ERROR')
+end 
+
 
 
 
@@ -65,9 +79,6 @@ function gethist(allinfo)
 dayvalue = unique(allinfo(:,3));
 fluvalue = unique(allinfo(:,2));
 roivalue = unique(allinfo(:,4));
-eachtable = [];
-sanity = [];
-
 
 %loop through all permutations (hopefully) and create graphs
 for g = 1:height(fluvalue)
@@ -88,6 +99,7 @@ for g = 1:height(fluvalue)
                for j = 1:height(cell2table(sanityrois))
                 
                 histogram(cell2mat(separaterois.HistogramData(j)),100,'FaceAlpha',0.4,'EdgeColor','none');
+                xlim([0 6000]);
 
                 title(strcat(' Fluorescent Dye ', string(g), ' Day ',string(h),' ROI ',string(i)));
                hold on 
@@ -108,12 +120,15 @@ for g = 1:height(fluvalue)
             for k = 1:height(cell2table(sanitydays))
                 
                 histogram(cell2mat(separatedays.HistogramData(k)),100,'FaceAlpha',0.4,'EdgeColor','none');
+                xlim([0 6000]);
 
                 title(strcat(' Fluorescent Dye ', string(g),' Day ',string(h) ,' All ROIs'));
                 hold on 
                end
 			   hold off
-           
+               
+               
+
            legdays = legend(sanitydays,'Location','bestoutside','FontSize',6,'NumColumns',3); 
            title(legdays, strcat('Number of files:  ', string(height(cell2table(sanitydays)))));
              sanitydays = [];
@@ -124,7 +139,7 @@ for g = 1:height(fluvalue)
             for l = 1:height(cell2table(sanityflus))
                 
                 histogram(cell2mat(separateflus.HistogramData(l)),100,'FaceAlpha',0.4,'EdgeColor','none');
-
+                xlim([0 6000]);
                 title(strcat(' Fluorescent Dye ', string(g),' All Days ',' All ROIs'));
                 hold on 
                end
@@ -170,7 +185,54 @@ end
 
 end
 
+function getpopulationhist(allinfo)
 
+dayvalue = unique(allinfo(:,3));
+fluvalue = unique(allinfo(:,2));
+
+%loop through all permutations (hopefully) and create graphs
+for g = 1:height(fluvalue)
+    for h = 1:height(dayvalue)
+            
+        someinfo = allinfo;
+        separateflus = someinfo(someinfo.FluorescentDye == fluvalue.FluorescentDye(g),:);
+        separatedays = separateflus(double(separateflus.Day) == double(dayvalue.Day(h)),:);      
+        
+        sanityflus = separateflus.FileName;
+        sanitydays = separatedays.FileName;
+               
+        figure()
+        allROIs = [];
+            %create population plot separated by day and dye only
+            for k = 1:height(cell2table(sanitydays))
+                
+                allROIs = [allROIs; cell2mat(separatedays.HistogramData(k))];
+            end
+            histogram(allROIs,100,'FaceAlpha',0.4,'EdgeColor','none');
+            title(strcat(' Fluorescent Dye ', string(g),' Day ',string(h) ,' All ROIs'));
+            %xlim([0 6000]);
+
+           %legdays = legend(sanitydays,'Location','bestoutside','FontSize',6,'NumColumns',3); 
+           %title(legdays, strcat('Number of files:  ', string(height(cell2table(sanitydays)))));
+             sanitydays = [];
+    end
+
+        figure()
+        alldays = [];
+            %create population plot separated by dye only
+            for k = 1:height(cell2table(sanityflus))
+                
+                alldays = [alldays; cell2mat(separateflus.HistogramData(k))];
+                size(alldays)
+            end
+            histogram(alldays,100,'FaceAlpha',0.4,'EdgeColor','none');
+            title(strcat(' Fluorescent Dye ', string(g),' All Days '));
+           
+           %legdays = legend(sanityflus,'Location','bestoutside','FontSize',6,'NumColumns',3); 
+           %title(legdays, strcat('Number of files:  ', string(height(cell2table(sanityflus)))));
+           sanityflus = [];
+end
+end 
 
 function  [imagefile, covmean, covsd, cov, ccvals, imprint] = getdata(imagefile, location, bin, imagetoggle)
 intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
@@ -180,8 +242,8 @@ colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif');
 
 [ccvals, imprint] = getcoloravg(intensityname, colorname, bin, imagetoggle);
 
-covmean = mean(ccvals);
-covsd = std(ccvals);
+covmean = mean(ccvals,'all');
+covsd = std(ccvals,0,'all'); % w = 0 to normalize by N-1 (default option)
 cov = covsd/covmean;
 
 end
