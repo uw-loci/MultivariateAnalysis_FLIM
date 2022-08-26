@@ -14,6 +14,7 @@ day = info.Day;
 roi = info.ROI;
 laserpower = info.LaserPower;
 binnums = info.BinNumber;
+time = info.CollectionTime;
 
 
 [numfile, infocat] = size(info);
@@ -22,8 +23,8 @@ fluvalue = unique(fludye);
 
 
 add = 0;
-varTypes = ["cell", "double", "double", "double", "double", "string", "double", "cell", "cell", "double", "double", "double", "double", "double", "double", "double"];
-varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "PowerCategory", "BinValue", "Masked Pixel Data", "Masked Chi Vals", "CCV CoV", "CCV Mean", "CCV Median", "CCV STDEV", "CHI Mean", "CHI Median", "CHI STDEV"];
+varTypes = ["cell", "double", "double", "double", "double", "string", "double", "cell", "cell", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
+varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "PowerCategory", "BinValue", "Masked Pixel Data", "Masked Chi Vals", "CCV CoV", "CCV Mean", "CCV Median", "CCV STDEV", "CHI Mean", "CHI Median", "CHI STDEV", "Intensity Mean", "Intensity Median", "Intensity STDEV", "Colletion Time (sec)"];
 infomeanchi = table('Size', [numfile, length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 close all;
 
@@ -38,9 +39,9 @@ for a = 1:numfile
     file = filenames(a,end);
     binnum = binnums(a,end);
 
-    [imtitle, imavg, immed, imstdev, variation, histdata, chipixels, imgmessage, chiavg, chimed, chistdev] = getmeanandchi(char(file), folderlocation, binnum, doyouwantimages);
+    [imtitle, imavg, immed, imstdev, variation, histdata, chipixels, imgmessage, chiavg, chimed, chistdev, intavg, intmed, intstdev] = getmeanandchi(char(file), folderlocation, binnum, doyouwantimages);
     
-    infomeanchi(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), temppoccell(a), binnums(a), histdata, chipixels, variation, imavg, immed, imstdev, chiavg, chimed, chistdev};
+    infomeanchi(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), temppoccell(a), binnums(a), histdata, chipixels, variation, imavg, immed, imstdev, chiavg, chimed, chistdev, intavg, intmed, intstdev, time(a)};
     add = add+1;
     data;
 end 
@@ -95,7 +96,7 @@ disp(imgmessage)
 
 
 
-function  [imagefile, imgmean, imgmedian, standarddev, cov, ccvals, chisquaredvals, imprint, chimean, chimedian, chistandarddev] = getmeanandchi(imagefile, location, bin, imagetoggle)
+function  [imagefile, imgmean, imgmedian, standarddev, cov, ccvals, chisquaredvals, imprint, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev] = getmeanandchi(imagefile, location, bin, imagetoggle)
 
 intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
 %IMPORTANT: filename in folder should have no spaces, use gitbash and asc
@@ -103,7 +104,7 @@ intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
 colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif'); 
 chiname = strcat(location, '\', imagefile, '_chi.tif');
 
-[ccvals, chisquaredvals, imprint] = getmaskedpixels(intensityname, colorname, chiname, bin, imagetoggle);
+[ccvals, chisquaredvals, intvals, imprint] = getmaskedpixels(intensityname, colorname, chiname, bin, imagetoggle);
 
 imgmean = mean(ccvals,'all');  %check for single value
 imgmedian = median(ccvals,'all');
@@ -114,10 +115,14 @@ chimean = mean(chisquaredvals, 'all');
 chimedian = median(chisquaredvals, 'all');
 chistandarddev = std(chisquaredvals, 0, 'all');     % w = 0 to normalize by N-1 (default option)
 
+intmean = mean(intvals, 'all');
+intmedian = median(intvals,'all');
+intstandarddev = std(intvals,0,'all');
+
 
 end
 
-function [pixelvals, chivals, imageprint] = getmaskedpixels(intensityfile, colorcodedfile, chifile, binval, imdis) 
+function [pixelvals, chivals, intensityvals, imageprint] = getmaskedpixels(intensityfile, colorcodedfile, chifile, binval, imdis) 
 
 %get intensity image
 intensity = bfopen(intensityfile);
@@ -128,7 +133,7 @@ flipped = flip(intensity);
 
 %bin options
 
-    insertbin = [((2*binval)+1), ((2*binval)+1)]; %2n+1 matrix
+insertbin = [((2*binval)+1), ((2*binval)+1)]; %2n+1 matrix
 
 
 %spatial binning approximation 
@@ -157,10 +162,14 @@ mask = double(mask);
 %apply mask of intensity image to images
 colorseg = colorfile.*mask;
 chiseg = chiimage.*mask;
+intensityseg = double(intensity).*mask;
+
 
 %get nonzero pixel values from segmented color image
 pixelvals = nonzeros(colorseg);
 chivals = nonzeros(chiseg);
+intensityvals = nonzeros(intensityseg);
+
 
 %displays images if needed 
 if imdis == 1
