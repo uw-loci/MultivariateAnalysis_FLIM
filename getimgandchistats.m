@@ -43,7 +43,7 @@ for a = 1:numfile
     
     infomeanchi(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), temppoccell(a), binnums(a), histdata, chipixels, variation, imavg, immed, imstdev, chiavg, chimed, chistdev, intavg, intmed, intstdev, time(a)};
     add = add+1;
-    data;
+    
 end 
 
 classify = array2table(["Lo"; "Me"; "HI"], 'VariableNames', "PowerCategory");
