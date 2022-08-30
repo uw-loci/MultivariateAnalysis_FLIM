@@ -2,7 +2,7 @@
 % USER INPUTS
 folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
 textfilename = 'fourdaystwodyes.txt';
-doyouwantimages = 1;    % 1 = yes display image, 0 = no
+doyouwantimages = 0;    % 1 = yes display image, 0 = no
 
 
 % START CODE
