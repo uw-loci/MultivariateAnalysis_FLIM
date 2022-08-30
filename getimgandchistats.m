@@ -4,6 +4,7 @@ folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
 textfilename = 'fourdaystwodyes.txt';
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
 
+testinggitupload = 'yes';
 
 % START CODE
 info = readtable(strcat(folderlocation, '\', textfilename));
