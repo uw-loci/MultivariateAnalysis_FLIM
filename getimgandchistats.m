@@ -1,4 +1,4 @@
-
+%version with time collection
 % USER INPUTS
 folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
 textfilename = 'fourdaystwodyes.txt';
