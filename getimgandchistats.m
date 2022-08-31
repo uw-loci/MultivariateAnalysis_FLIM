@@ -1,7 +1,9 @@
 %version with time collection
 % USER INPUTS
-folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
-textfilename = 'fourdaystwodyes.txt';
+folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220830_analysis';
+textfilename = 'rho110onlytrial.txt';   %if file name is right but error on run, make sure color coded value files have no space in name
+lasercategories = ["L"; "M"; "H"]; %must be in ascending order
+
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
 
 testinggitupload = 'yes';
@@ -47,7 +49,7 @@ for a = 1:numfile
     
 end 
 
-classify = array2table(["Lo"; "Me"; "HI"], 'VariableNames', "PowerCategory");
+classify = array2table(lasercategories, 'VariableNames', "PowerCategory");
 %sort laser powers
 classifieddata = table('Size', [0, length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 
@@ -69,9 +71,21 @@ for g = 1:height(fluvalue)
 
             %isolate 3 pockel values and add column classifiying high,
             %medium, low 
-            pocvals =  separatedays((separatedays.ROI == roivalue.ROI(b)),:);
-            sortedpoc = sortrows(pocvals,"LaserPower");
-            classifieddata = [classifieddata; sortedpoc(:, 1:5), classify, sortedpoc(:,7:end);];
+            pocvals =  separatedays((separatedays.ROI == roivalue.ROI(b)),:)
+            sortedpoc = sortrows(pocvals,"LaserPower")
+            laservals = unique(sortedpoc.LaserPower)
+            for i = 1:height(sortedpoc)
+                for j = 1:height(laservals)
+                     if height(laservals) ~= height(classify)
+                         disp('ERROR: possible mismatch in number of laser powers used and number of laser power categories')
+                         return
+                     else if sortedpoc.LaserPower(i) == laservals(j,:)
+                        classifieddata = [classifieddata; sortedpoc(i, 1:5), classify(j,:), sortedpoc(i,7:end);];
+                     end               
+                     end
+                end
+            end
+
         end 
     end
 end
