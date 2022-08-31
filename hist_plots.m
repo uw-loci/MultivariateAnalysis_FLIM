@@ -1,31 +1,33 @@
 
-folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220824_analysis';
-textfilename = 'bothdyesfor22and23.txt';
-
+%USER INPUTS
+folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220830_analysis';
+textfilename = 'rho110onlytrial.txt';
 info = readtable(strcat(folderlocation, '\', textfilename));
 
-
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
-doyouwanthistograms = 0;    % 1 = yes display histograms, 0 = no
-doyouwantgrouphist = 0; % 1 = yes display grouped histograms, 0 = no
+doyouwanthistograms = 1;    % 1 = yes display histograms, 0 = no
+doyouwantgrouphist = 1; % 1 = yes display grouped histograms, 0 = no
 
+%START CODE
+%section out different columns
 filenames = info.ImageFile; 
 fludye = info.FluorescentDye;
 day = info.Day;
 roi = info.ROI;
 laserpower = info.LaserPower;
 binnums = info.BinNumber;
+time = info.CollectionTime;
 
-
+%find the number of files, number of days, and number of dyes
 [numfile, infocat] = size(info);
 dayvalues = unique(day);
 fluvalue = unique(fludye);
 
-
+%create empty table for data outputs
 add = 0;
 data = ["FileName", "Mean", "StandardDeviation", "CoeffOfVariation"];
-varTypes = ["cell", "double", "double", "double", "double", "double", "cell"];
-varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "BinValue", "HistogramData"];
+varTypes = ["cell", "double", "double", "double", "double", "double", "double", "cell"];
+varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "BinValue", "CollectionTime", "HistogramData"];
 histtable = table('Size', [numfile, infocat+1],'VariableTypes',varTypes, 'VariableNames',varNames);
 close all;
 
@@ -34,24 +36,26 @@ for a = 1:numfile
 
     file = filenames(a,end);
     binnum = binnums(a,end);
-
+    
+    %use "get data" function to start creating table with statistics and
+    %histogram values
     [imtitle, average, stdev, variation, histdata, imgmessage] = getdata(char(file), folderlocation, binnum, doyouwantimages);
     data = [data; string(imtitle), string(average), string(stdev), string(variation)];
 
-    histtable(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), binnums(a), histdata};
+    histtable(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), binnums(a), time(a), histdata};
     add = add+1;
     data;
 end 
 
-
-        
+     
 add;
-data
-histtable
-disp(imgmessage)
 
-%get separated histograms
+
+
+
+%get separated histograms if desired
 if doyouwanthistograms == 1
+    %calls gethist function to create the histograms
     gethist(histtable) 
     disp('histograms displayed')
 elseif doyouwanthistograms == 0
@@ -60,8 +64,9 @@ else
     disp('doyouwanthistogram ERROR')
 end 
 
-%get grouped histograms
+%get grouped histograms if desired
 if doyouwantgrouphist == 1
+    %calls getpopulationhist to create group histograms
     getpopulationhist(histtable)  
     disp('group histogram displayed')
 elseif doyouwanthistograms == 0
@@ -71,9 +76,27 @@ else
 end 
 
 
+%OUTPUTS
+data %some statistics (more with getimgandchistats file)
+histtable %final table, copy of input with histogram data column showing number of values per file distribution
+disp(imgmessage) %tells whether images were printed or not
+
+
+
+
+
+
+
+
+
+
+
 
 
 function gethist(allinfo)
+%THIS FUNCTION PUTS THE FILE DATA INTO HISTOGRAMS
+
+%gets number of files, days, dyes, and rois
 [numfile, ~] = size(allinfo);
 dayvalue = unique(allinfo(:,3));
 fluvalue = unique(allinfo(:,2));
@@ -84,16 +107,19 @@ for g = 1:height(fluvalue)
     for h = 1:height(dayvalue)
         for i = 1:height(roivalue)
             
+            %segments the whole table to into specific dyes, days, and rois
             someinfo = allinfo;
             separateflus = someinfo(someinfo.FluorescentDye == fluvalue.FluorescentDye(g),:);
             separatedays = separateflus(double(separateflus.Day) == double(dayvalue.Day(h)),:);
             separaterois = separatedays(separatedays.ROI == roivalue.ROI(i),:);            
             
+            %file names for each segmented table, used for legend
             sanityflus = separateflus.FileName;
             sanitydays = separatedays.FileName;
             sanityrois = separaterois.FileName;
            
             figure()
+
            %create plot separated by day, dye, and ROI
                for j = 1:height(cell2table(sanityrois))
                 
@@ -115,6 +141,7 @@ for g = 1:height(fluvalue)
         end
 
             figure()
+
             %create plot separated by day and dye only
             for k = 1:height(cell2table(sanitydays))
                 
@@ -126,8 +153,6 @@ for g = 1:height(fluvalue)
                end
 			   hold off
                
-               
-
            legdays = legend(sanitydays,'Location','bestoutside','FontSize',6,'NumColumns',3); 
            title(legdays, strcat('Number of files:  ', string(height(cell2table(sanitydays)))));
              sanitydays = [];
@@ -150,7 +175,7 @@ for g = 1:height(fluvalue)
 end
 
 
-%%old for loop, to separate day and dye (4 plots)
+% OLD VERSION OF FOR LOOP, to separate day and dye (4 plots)
 %{
 count = 1;
 for c = 1:height(fluvalue)
@@ -184,25 +209,33 @@ end
 
 end
 
-function getpopulationhist(allinfo)
 
+function getpopulationhist(allinfo)
+%THIS FUNCTION CREATES GROUP HISTOGRAMS WITH ONE DISTRIBUTION (DATA
+%COMBINED FROM MULTIPLE FILES)
+
+%get day and dye numbers 
 dayvalue = unique(allinfo(:,3));
 fluvalue = unique(allinfo(:,2));
 
 %loop through all permutations (hopefully) and create graphs
 for g = 1:height(fluvalue)
     for h = 1:height(dayvalue)
-            
+        
+        %creates separate tables
         someinfo = allinfo;
         separateflus = someinfo(someinfo.FluorescentDye == fluvalue.FluorescentDye(g),:);
         separatedays = separateflus(double(separateflus.Day) == double(dayvalue.Day(h)),:);      
         
+        %file names in tables, used for legend
         sanityflus = separateflus.FileName;
         sanitydays = separatedays.FileName;
                
         figure()
         allROIs = [];
-            %create population plot separated by day and dye only
+            %create "population plot" separated by DAY AND DYE 
+            % concatenated to show one distribution 
+
             for k = 1:height(cell2table(sanitydays))
                 
                 allROIs = [allROIs; cell2mat(separatedays.HistogramData(k))];
@@ -218,11 +251,12 @@ for g = 1:height(fluvalue)
 
         figure()
         alldays = [];
-            %create population plot separated by dye only
+            %create "population plot" separated by DYE ONLY 
+            % concatenated to show one distribution
             for k = 1:height(cell2table(sanityflus))
                 
                 alldays = [alldays; cell2mat(separateflus.HistogramData(k))];
-                size(alldays)
+                size(alldays);
             end
             histogram(alldays,100,'FaceAlpha',0.4,'EdgeColor','none');
             title(strcat(' Fluorescent Dye ', string(g),' All Days '));
@@ -233,13 +267,19 @@ for g = 1:height(fluvalue)
 end
 end 
 
+
 function  [imagefile, covmean, covsd, cov, ccvals, imprint] = getdata(imagefile, location, bin, imagetoggle)
-intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
+%THIS FUNCTION CALLS getmaskedpixels TO GET THE MASKED DATA AND THEN COMPUTES
+%THE STATISTICS FOUND IN THE data OUTPUT TABLE
 %IMPORTANT: filename in folder should have no spaces, use gitbash and asc
 %to tif file to change SPCImage output
-colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif');   
 
-[ccvals, imprint] = getcoloravg(intensityname, colorname, bin, imagetoggle);
+intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
+
+colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif');  
+chiname = strcat(location, '\', imagefile, '_chi.tif');
+
+[ccvals, chisquaredvals, intvals, imprint] = getmaskedpixels(intensityname, colorname, chiname, bin, imagetoggle);
 
 covmean = mean(ccvals,'all');
 covsd = std(ccvals,0,'all'); % w = 0 to normalize by N-1 (default option)
@@ -248,8 +288,11 @@ cov = covsd/covmean;
 end
 
 
-function [pixelvals, imageprint] = getcoloravg(intensityfile, colorcodedfile, binval, imdis) 
+function [pixelvals, chivals, intensityvals, imageprint] = getmaskedpixels(intensityfile, colorcodedfile, chifile, binval, imdis) 
+%THIS FUNCTION IS DESIGNED TO APPLY THE MASKS TO THE EXPORTED SPCIMAGE
+%FILES
 
+%CREATING MASK
 %get intensity image
 intensity = bfopen(intensityfile);
 intensity = intensity{1}{1};
@@ -257,55 +300,60 @@ intensity = intensity{1}{1};
 %flip intensity image to match color coded SPCImage output
 flipped = flip(intensity);
 
-%bin options
+%bin based on the corresponding value in the text file for each file
 
-    insertbin = [((2*binval)+1), ((2*binval)+1)]; %2n+1 matrix
+insertbin = [((2*binval)+1), ((2*binval)+1)]; %2n+1 matrix
 
 
-%spatial binning approximation 
+%spatial binning approximation applied to intensity image
 binned = medfilt2(flipped, insertbin);
 
 %segment image 
 segmented = binned; 
+%filters out intensity pixels outside specified percentile
 segmented(segmented > prctile(binned,80,'all')) = 0; %orig 80,20
 segmented(segmented < prctile(binned,20,'all')) = 0;
+intmask = segmented;
 
-%create mask
-mask = segmented;
-mask(mask > 0) = 1;
+
+%open chi squared image
+chiformask = bfopen(chifile);
+chiformask = chiformask{1}{1};
+%filter out chi squared outliers
+chiformask(chiformask > 2) = 0;
+chiformask(chiformask ~= 0) = 1;
+chimask = chiformask;
+%imshow(chimask);
+
+%option to print number of chi squared outliers being removed
+numberofchioutliers = numel(chiformask) - nnz(chiformask); 
+
+
+%create total mask
+totalmask = double(intmask).*double(chimask);
+totalmask(totalmask > 0) = 1;
 
 %get color coded image
 colorfile = bfopen(colorcodedfile);
 colorfile = colorfile{1}{1};
 
+%get chi image
+chiimage = bfopen(chifile);
+chiimage = chiimage{1}{1};
+
 %convert mask uint16 to double 
-mask = double(mask);
+totalmask = double(totalmask);
 
-%apply mask of intensity image to color coded image
-colorseg = colorfile.*mask;
+%apply mask to images
+colorseg = colorfile.*totalmask;
+chiseg = chiimage.*totalmask;
+intensityseg = double(intensity).*totalmask;
 
-%get nonzero pixel values from segmented color image
+
+%get nonzero pixel values from segmented color image to use for statistics
 pixelvals = nonzeros(colorseg);
-
-%{
-%specify number of elements to average
-n = 1000;
-
-%find remainder 
-[pixelrow pixelcol] = size(pixelvals)
-r = rem(pixelrow,n)
-
-%get averages as distribution
-maxele = pixelrow - r; %max element number based on remainder
-
-averagethese = pixelvals([1:maxele],:);
-avgmatrix = reshape(averagethese, [], n) %specified number of columns
-avg = mean(avgmatrix); %averages the values in the rows
-avg = avg'; %transpose averages for concatenation 
-remavg = mean(pixelvals([maxele+1:pixelrow],:)); %avg of remainder
-coloravgdis = [avg; remavg]; %complete average distribution for segmented color coded values
-
-%}
+chivals = nonzeros(chiseg);
+intensityvals = nonzeros(intensityseg);
 
 
 %displays images if needed 
@@ -327,16 +375,16 @@ if imdis == 1
         axis image
         title('binned intensity image')
         colorbar;
-        subplot(3,2,5), imagesc(segmented);
+        subplot(3,2,5), imagesc(intmask);
         axis image
         title('segmented intensity image')
         caxis manual;
         caxis([colorbtm colortop])
         colorbar;					 
         
-        subplot(3,2,2), imagesc(mask)
+        subplot(3,2,2), imagesc(totalmask)
         axis image
-        title('mask of intensity image')
+        title('total mask of intensity image')
         colorbar;
         
         subplot(3,2,4), imagesc(colorfile);
@@ -361,11 +409,9 @@ if imdis == 1
         imageprint = ('doyouwantimage = 0, no image display');
     else
         imageprint = ('doyouwantimage ERROR');
-end 
 
 end 
-
-
+end
 
 
 

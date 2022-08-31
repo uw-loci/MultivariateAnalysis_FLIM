@@ -1,4 +1,4 @@
-%version with time collection
+
 % USER INPUTS
 folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220830_analysis';
 textfilename = 'rho110onlytrial.txt';   %if file name is right but error on run, make sure color coded value files have no space in name
@@ -43,7 +43,7 @@ for a = 1:numfile
     file = filenames(a,end);
     binnum = binnums(a,end);
 
-    %use "get chi and mean" function to add the statictics to the table
+    %use "get mean and chi" function to add the statictics to the table
     [imtitle, imavg, immed, imstdev, variation, histdata, chipixels, imgmessage, chiavg, chimed, chistdev, intavg, intmed, intstdev] = getmeanandchi(char(file), folderlocation, binnum, doyouwantimages);
     
     infomeanchi(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), temppoccell(a), binnums(a), histdata, chipixels, variation, imavg, immed, imstdev, chiavg, chimed, chistdev, intavg, intmed, intstdev, time(a)};
