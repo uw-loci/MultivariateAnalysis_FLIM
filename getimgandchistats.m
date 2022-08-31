@@ -6,11 +6,12 @@ lasercategories = ["L"; "M"; "H"]; %must be in ascending order
 
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
 
-testinggitupload = 'yes';
+%testinggitupload = 'yes';
 
 % START CODE
 info = readtable(strcat(folderlocation, '\', textfilename));
 
+%section out different columns
 filenames = info.ImageFile; 
 fludye = info.FluorescentDye;
 day = info.Day;
@@ -19,12 +20,12 @@ laserpower = info.LaserPower;
 binnums = info.BinNumber;
 time = info.CollectionTime;
 
-
+%find the number of files, number of days, and number of dyes
 [numfile, infocat] = size(info);
 dayvalues = unique(day);
 fluvalue = unique(fludye);
 
-
+%create empty table for data outputs
 add = 0;
 varTypes = ["cell", "double", "double", "double", "double", "string", "double", "cell", "cell", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
 varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "PowerCategory", "BinValue", "Masked Pixel Data", "Masked Chi Vals", "CCV CoV", "CCV Mean", "CCV Median", "CCV STDEV", "CHI Mean", "CHI Median", "CHI STDEV", "Intensity Mean", "Intensity Median", "Intensity STDEV", "Colletion Time (sec)"];
@@ -36,12 +37,13 @@ temppoccell = zeros([numfile,1]);
 table(temppoccell);
 
 
-%get data for histogram
+%get data for table
 for a = 1:numfile
 
     file = filenames(a,end);
     binnum = binnums(a,end);
 
+    %use "get chi and mean" function to add the statictics to the table
     [imtitle, imavg, immed, imstdev, variation, histdata, chipixels, imgmessage, chiavg, chimed, chistdev, intavg, intmed, intstdev] = getmeanandchi(char(file), folderlocation, binnum, doyouwantimages);
     
     infomeanchi(a,:) = {imtitle, fludye(a), day(a), roi(a), laserpower(a), temppoccell(a), binnums(a), histdata, chipixels, variation, imavg, immed, imstdev, chiavg, chimed, chistdev, intavg, intmed, intstdev, time(a)};
@@ -49,16 +51,22 @@ for a = 1:numfile
     
 end 
 
+%creates a table out of the user specified laser categories 
 classify = array2table(lasercategories, 'VariableNames', "PowerCategory");
+
 %sort laser powers
 classifieddata = table('Size', [0, length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 
+%identify the different days, dyes, and number of ROIs from the completed
+%table with statistics
 dayvalue = unique(infomeanchi(:,3));
 fluvalue = unique(infomeanchi(:,2));
 roivalue = unique(infomeanchi(:,4));
 
 add = 0;
 
+%separate out the ROIs and assign the different laser powers a
+%classisfication from the user input
 for g = 1:height(fluvalue)
     for h = 1:height(dayvalue)
         %filter by dye and day
@@ -68,18 +76,20 @@ for g = 1:height(fluvalue)
             for b = 1:height(unique(separatedays.ROI))
             add = add +1;
             
-
-            %isolate 3 pockel values and add column classifiying high,
-            %medium, low 
+            %isolate the unique pockel values, sort them, and add user classification 
             pocvals =  separatedays((separatedays.ROI == roivalue.ROI(b)),:)
-            sortedpoc = sortrows(pocvals,"LaserPower")
-            laservals = unique(sortedpoc.LaserPower)
+            sortedpoc = sortrows(pocvals,"LaserPower");
+            laservals = unique(sortedpoc.LaserPower);
+            
             for i = 1:height(sortedpoc)
                 for j = 1:height(laservals)
                      if height(laservals) ~= height(classify)
                          disp('ERROR: possible mismatch in number of laser powers used and number of laser power categories')
-                         return
+                         return %will stop the code if the user input for laser classification does not have enough categories
+
                      else if sortedpoc.LaserPower(i) == laservals(j,:)
+                        %creates the final output table with statistics and
+                        %user classified laser powers 
                         classifieddata = [classifieddata; sortedpoc(i, 1:5), classify(j,:), sortedpoc(i,7:end);];
                      end               
                      end
@@ -92,11 +102,11 @@ end
 
         
 add;
-infomeanchi;
+infomeanchi; %table with statistics only (not classified laser powers)
 
 %   OUTPUTS
-classifieddata
-disp(imgmessage)
+classifieddata %final table with statistics and laserpower classification column
+disp(imgmessage) %tells whether images were printed or not
 
 
 
@@ -112,15 +122,21 @@ disp(imgmessage)
 
 
 function  [imagefile, imgmean, imgmedian, standarddev, cov, ccvals, chisquaredvals, imprint, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev] = getmeanandchi(imagefile, location, bin, imagetoggle)
+%THIS FUNCTION IS DESIGNED TO USE THE SPCIMAGE EXPORT FILES (.tif only) AND CREATE
+%STATISTICS FOR COLOR CODED VALUE IMAGE, CHI SQUARED, AND INTENSITY IMAGE
+%IMPORTANT: filename in folder should have no spaces, use gitbash and asc
+%to tif file to change SPCImage output 
+%(EX.) "color coded value.asc" should be "colorcodedvalue.tif"
 
 intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
-%IMPORTANT: filename in folder should have no spaces, use gitbash and asc
-%to tif file to change SPCImage output
+
 colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif'); 
 chiname = strcat(location, '\', imagefile, '_chi.tif');
 
+%for each file, calls "get masked pixels" to apply the mask to the images
 [ccvals, chisquaredvals, intvals, imprint] = getmaskedpixels(intensityname, colorname, chiname, bin, imagetoggle);
 
+%calculate statistics for each file type
 imgmean = mean(ccvals,'all');  %check for single value
 imgmedian = median(ccvals,'all');
 standarddev = std(ccvals,0, 'all');        % w = 0 to normalize by N-1 (default option)
@@ -138,7 +154,10 @@ intstandarddev = std(intvals,0,'all');
 end
 
 function [pixelvals, chivals, intensityvals, imageprint] = getmaskedpixels(intensityfile, colorcodedfile, chifile, binval, imdis) 
+%THIS FUNCTION IS DESIGNED TO APPLY THE MASKS TO THE EXPORTED SPCIMAGE
+%FILES
 
+%CREATING MASK
 %get intensity image
 intensity = bfopen(intensityfile);
 intensity = intensity{1}{1};
@@ -146,41 +165,57 @@ intensity = intensity{1}{1};
 %flip intensity image to match color coded SPCImage output
 flipped = flip(intensity);
 
-%bin options
+%bin based on the corresponding value in the text file for each file
 
 insertbin = [((2*binval)+1), ((2*binval)+1)]; %2n+1 matrix
 
 
-%spatial binning approximation 
+%spatial binning approximation applied to intensity image
 binned = medfilt2(flipped, insertbin);
 
 %segment image 
 segmented = binned; 
+%filters out intensity pixels outside specified percentile
 segmented(segmented > prctile(binned,80,'all')) = 0; %orig 80,20
 segmented(segmented < prctile(binned,20,'all')) = 0;
+intmask = segmented;
 
-%create mask
-mask = segmented;
-mask(mask > 0) = 1;
+
+%open chi squared image
+chiformask = bfopen(chifile);
+chiformask = chiformask{1}{1};
+%filter out chi squared outliers
+chiformask(chiformask > 2) = 0;
+chiformask(chiformask ~= 0) = 1;
+chimask = chiformask;
+%imshow(chimask);
+
+%option to print number of chi squared outliers being removed
+numberofchioutliers = numel(chiformask) - nnz(chiformask); 
+
+
+%create total mask
+totalmask = double(intmask).*double(chimask);
+totalmask(totalmask > 0) = 1;
 
 %get color coded image
 colorfile = bfopen(colorcodedfile);
 colorfile = colorfile{1}{1};
 
-%get chi squared image
+%get chi image
 chiimage = bfopen(chifile);
 chiimage = chiimage{1}{1};
 
 %convert mask uint16 to double 
-mask = double(mask);
+totalmask = double(totalmask);
 
-%apply mask of intensity image to images
-colorseg = colorfile.*mask;
-chiseg = chiimage.*mask;
-intensityseg = double(intensity).*mask;
+%apply mask to images
+colorseg = colorfile.*totalmask;
+chiseg = chiimage.*totalmask;
+intensityseg = double(intensity).*totalmask;
 
 
-%get nonzero pixel values from segmented color image
+%get nonzero pixel values from segmented color image to use for statistics
 pixelvals = nonzeros(colorseg);
 chivals = nonzeros(chiseg);
 intensityvals = nonzeros(intensityseg);
@@ -205,16 +240,16 @@ if imdis == 1
         axis image
         title('binned intensity image')
         colorbar;
-        subplot(3,2,5), imagesc(segmented);
+        subplot(3,2,5), imagesc(intmask);
         axis image
         title('segmented intensity image')
         caxis manual;
         caxis([colorbtm colortop])
         colorbar;					 
         
-        subplot(3,2,2), imagesc(mask)
+        subplot(3,2,2), imagesc(totalmask)
         axis image
-        title('mask of intensity image')
+        title('total mask of intensity image')
         colorbar;
         
         subplot(3,2,4), imagesc(colorfile);
