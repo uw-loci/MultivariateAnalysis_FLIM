@@ -1,7 +1,7 @@
 
 % USER INPUTS
-folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\20220830_analysis';
-textfilename = 'rho110onlytrial.txt';   %if file name is right but error on run, make sure color coded value files have no space in name
+folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
+textfilename = 'fivedaystwodyes.txt';   %if file name is right but error on run, make sure color coded value files have no space in name
 lasercategories = ["L"; "M"; "H"]; %must be in ascending order
 
 doyouwantimages = 0;    % 1 = yes display image, 0 = no
@@ -28,7 +28,7 @@ fluvalue = unique(fludye);
 %create empty table for data outputs
 add = 0;
 varTypes = ["cell", "double", "double", "double", "double", "string", "double", "cell", "cell", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "PowerCategory", "BinValue", "Masked Pixel Data", "Masked Chi Vals", "CCV CoV", "CCV Mean", "CCV Median", "CCV STDEV", "CHI Mean", "CHI Median", "CHI STDEV", "Intensity Mean", "Intensity Median", "Intensity STDEV", "Colletion Time (sec)"];
+varNames = ["FileName", "FluorescentDye", "Day", "ROI", "LaserPower", "PowerCategory", "BinValue", "MaskedPixelData", "MaskedChiVals", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "IntensityMean", "IntensityMedian", "IntensitySTDEV", "ColletionTime(sec)"];
 infomeanchi = table('Size', [numfile, length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 close all;
 
@@ -77,7 +77,7 @@ for g = 1:height(fluvalue)
             add = add +1;
             
             %isolate the unique pockel values, sort them, and add user classification 
-            pocvals =  separatedays((separatedays.ROI == roivalue.ROI(b)),:)
+            pocvals =  separatedays((separatedays.ROI == roivalue.ROI(b)),:);
             sortedpoc = sortrows(pocvals,"LaserPower");
             laservals = unique(sortedpoc.LaserPower);
             
@@ -108,10 +108,18 @@ infomeanchi; %table with statistics only (not classified laser powers)
 classifieddata %final table with statistics and laserpower classification column
 disp(imgmessage) %tells whether images were printed or not
 
+%%
+%perform anova (on CCV medium) for each dye, with variables of Power, Day, ROI
+% , as specified in eachdyeanova function 
+anovaoutput = {"AnovaName", "AnovaResults"};
+for k = 1:height(fluvalue)
+    anovaname = strcat('annovafordye',string(k));
+    results = eachdyeanova(classifieddata, k);
+    anovaoutput = [anovaoutput; {anovaname}, {results}];
 
+end 
 
-
-
+%%
 
 
 
