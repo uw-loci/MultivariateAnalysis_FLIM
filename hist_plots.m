@@ -287,7 +287,7 @@ cov = covsd/covmean;
 
 end
 
-
+%{
 function [pixelvals, chivals, intensityvals, imageprint] = getmaskedpixels(intensityfile, colorcodedfile, chifile, binval, imdis) 
 %THIS FUNCTION IS DESIGNED TO APPLY THE MASKS TO THE EXPORTED SPCIMAGE
 %FILES
@@ -413,6 +413,6 @@ if imdis == 1
 end 
 end
 
-
+%} 
 
 
