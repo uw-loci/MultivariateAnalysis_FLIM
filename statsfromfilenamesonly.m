@@ -29,7 +29,7 @@ for num = 1:length(ccvlist)
 
     %CREATING MASK
     %get intensity image
-    intensity = importdata(string(strcat(folder, '\',intensitylist(num))));
+    intensity = dlmread(string(strcat(folder, '\',intensitylist(num))));
     %intensity = intensity{1}{1};
     
     %flip intensity image to match color coded SPCImage output
@@ -37,7 +37,7 @@ for num = 1:length(ccvlist)
     
   
     %open chi squared image
-    chiformask = importdata(strcat(folder, '\',chilist(num)));
+    chiformask = dlmread(strcat(folder, '\',chilist(num)));
     %chiformask = chiformask{1}{1};
     %filter out chi squared outliers
     chiformask(chiformask > 2) = 0;
@@ -50,11 +50,11 @@ for num = 1:length(ccvlist)
     totalmask(totalmask > 0) = 1;
     
     %get color coded image
-    colorfile = importdata(strcat(folder, '\',ccvlist(num)));
+    colorfile = dlmread(strcat(folder, '\',ccvlist(num)));
     % colorfile = colorfile{1}{1};
     
     %get chi image
-    chiimage = importdata(strcat(folder, '\',chilist(num)));
+    chiimage = dlmread(strcat(folder, '\',chilist(num)));
     %chiimage = chiimage{1}{1};
     
     %convert mask uint16 to double 
