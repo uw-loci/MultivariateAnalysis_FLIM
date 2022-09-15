@@ -2,6 +2,7 @@ function [pixelvals, chivals, intensityvals, imageprint] = getmaskedpixels(inten
 %THIS FUNCTION IS DESIGNED TO APPLY THE MASKS TO THE EXPORTED SPCIMAGE
 %FILES
 
+
 %CREATING MASK
 %get intensity image
 intensity = bfopen(intensityfile);
@@ -33,7 +34,9 @@ chiformask = chiformask{1}{1};
 chiformask(chiformask > 2) = 0;
 chiformask(chiformask ~= 0) = 1;
 chimask = chiformask;
+%figure();
 %imshow(chimask);
+%colorbar();
 
 %option to print number of chi squared outliers being removed
 numberofchioutliers = numel(chiformask) - nnz(chiformask); 
@@ -57,7 +60,7 @@ totalmask = double(totalmask);
 %apply mask to images
 colorseg = colorfile.*totalmask;
 chiseg = chiimage.*totalmask;
-intensityseg = double(intensity).*totalmask;
+intensityseg = double(flipped).*totalmask;
 
 
 %get nonzero pixel values from segmented color image to use for statistics
