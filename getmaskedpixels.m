@@ -57,7 +57,7 @@ totalmask = double(totalmask);
 %apply mask to images
 colorseg = colorfile.*totalmask;
 chiseg = chiimage.*totalmask;
-intensityseg = double(intensity).*totalmask;
+intensityseg = double(flipped).*totalmask;
 
 
 %get nonzero pixel values from segmented color image to use for statistics
