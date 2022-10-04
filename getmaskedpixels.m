@@ -65,6 +65,34 @@ pixelvals = nonzeros(colorseg);
 chivals = nonzeros(chiseg);
 intensityvals = nonzeros(intensityseg);
 
+<<<<<<< Updated upstream
+=======
+disp('function used: getmaskedpixels')
+
+%{
+figure()
+    subplot(2,3,1)
+    imshow(intensity)
+    title('intensity')
+    subplot(2,3,3) 
+    imshow(totalmask)
+    title('totalmask')
+    subplot(2,3,5)
+    imshow(intensityseg)
+    title('intensityseg')
+    subplot(2,3,2)
+    imshow(chiimage)
+    title('chiimage')
+    subplot(2,3,4)
+    imshow(colorfile)
+    title('colorfile')
+    subplot(2,3,6)
+    imshow(flipped)
+    title('flipped-has mask')
+    intensityfile
+    return
+%}
+>>>>>>> Stashed changes
 
 %displays images if needed 
 if imdis == 1
