@@ -12,5 +12,6 @@ day = dyedata.Day;
 rois = dyedata.ROI;
 
 [anovastats, anovatbl] = anovan(affectedvariable, {power, day, rois});
+disp('function used: eachdyeanova')
 
 end 

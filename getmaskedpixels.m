@@ -65,8 +65,6 @@ pixelvals = nonzeros(colorseg);
 chivals = nonzeros(chiseg);
 intensityvals = nonzeros(intensityseg);
 
-<<<<<<< Updated upstream
-=======
 disp('function used: getmaskedpixels')
 
 %{
@@ -92,7 +90,7 @@ figure()
     intensityfile
     return
 %}
->>>>>>> Stashed changes
+
 
 %displays images if needed 
 if imdis == 1
