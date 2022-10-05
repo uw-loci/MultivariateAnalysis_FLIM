@@ -37,10 +37,10 @@ filenamelist = ls(filelocation);
            chilist = contains(filenamelist(temp,:),"chi.asc");
            intensitylist = contains(filenamelist(temp,:),"photons.asc");
            
-           if ccvlist == 1
-               ccvfiles = [ccvfiles; string(strtrim(filenamelist(temp,:)))]
-           elseif chilist == 1
+           if chilist == 1
                chifiles = [chifiles; string(strtrim(filenamelist(temp,:)))];
+            elseif ccvlist == 1
+               ccvfiles = [ccvfiles; string(strtrim(filenamelist(temp,:)))];
            elseif  intensitylist ==1
                intensityfiles = [intensityfiles; string(strtrim(filenamelist(temp,:)))];
            end 
@@ -132,6 +132,7 @@ for b = 1:length(filenames)
     levelindex = find(contains(outputdata.FileName,filenames(b)))
     splitchi = strsplit(chifiles(rindex), '_');
     editedchi = [editedchi; strcat(splitchi(1), '_', string(laserpower(b)), '_', laserlevel(levelindex), '_', splitchi(2), '_', splitchi(3), '_', splitchi(4))];
+
 end
 
 for c = 1:length(filenames)
@@ -151,19 +152,23 @@ editedint
 
 for i = 1:length(filenames)
     %find where ccvfiles contains the correct filename
-    rindex = find(contains(ccvfiles, filenames(i)))
+    rindex = find(contains(ccvfiles, filenames(i)));
     %make the current file location
     ccvcurrent = fullfile(filelocation, ccvfiles(rindex));
     %find where the edited names has the current file name and make new
     %file 
     ccvnew = fullfile(newfolder, editedccv(find(contains(editedccv, filenames(i)))));
-    
+    %disp(rindex)
+
     rindex = find(contains(chifiles, filenames(i)));
-    chicurrent = fullfile(filelocation, chifiles(i));
-    chinew = fullfile(newfolder, editedchi(find(contains(editedchi, filenames(i)))));
-    
+    %disp(rindex)
+    chicurrent = fullfile(filelocation, chifiles(rindex));
+    chinew_ = editedchi(find(contains(editedchi, filenames(i))));
+    chinew = fullfile(newfolder, chinew_);
+    %disp([chifiles(i), "--",chinew_]);
+
     rindex = find(contains(intensityfiles, filenames(i)));
-    intcurrent = fullfile(filelocation, intensityfiles(i));
+    intcurrent = fullfile(filelocation, intensityfiles(rindex));
     intnew = fullfile(newfolder, editedint(find(contains(editedint, filenames(i)))));
 
 
