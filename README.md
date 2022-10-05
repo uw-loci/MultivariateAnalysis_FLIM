@@ -4,7 +4,7 @@ Determination of Coefficient of Variation in complex FLIM datasets under differe
 
 ## Results
 
-- * Large Cov is strongly associated with long-lifetime FLIM data *
+- **Large Cov is strongly associated with long-lifetime FLIM data**
 
 ## Goals
 
