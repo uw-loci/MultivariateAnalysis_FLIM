@@ -5,7 +5,14 @@
 filelocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fitFilesHelen';
 newfolder = 'C:\Users\hwilson23\Documents\UserDataOWS\neweditednames';
 textlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
-textfilename = 'fivedaystwodyes.txt';   
+if isfolder(textlocation)
+    textfilename = 'fivedaystwodyes.txt';   
+else
+    filelocation = 'J:\.shortcut-targets-by-id\1lKaqvovu-XhFoeJiDWfI36ZYJFMMZx_v\Fluroescent dye variability\Data\fitFilesHelen';
+    newfolder = 'C:\Users\lociu\Documents\temp';
+    textlocation = 'J:\.shortcut-targets-by-id\1lKaqvovu-XhFoeJiDWfI36ZYJFMMZx_v\Fluroescent dye variability';
+    textfilename = 'matlab_text_output.txt';
+end
 
 %open files
 info = readtable(strcat(textlocation, '\', textfilename));
