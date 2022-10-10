@@ -17,23 +17,24 @@ for a = 1:length(ccvlist)
     currentim = dlmread(currentfile);
     %figure()
     %imshow(currentim)
-    axis on
-    clim auto
-    colorbar()
+    
+    %axis on
+    %clim auto
+    %colorbar()
     
     %%create mask
     formask = currentim;
     imbinarize(formask);
-    figure()
+    %figure()
     %imshow(formask)
-    axis on
+    %axis on
 
     %segmentation code based off of Image Analyst's Image Segmentation
     %Tutorial - uses connected componenets labeling
-    [labeledImage, numgrains] = bwlabel(formask, 8);    %8 used to set connectivity type 
+    [labeledImage, numgrains] = bwlabel(medfilt2(formask,[3,3]), 8);    %8 used to set connectivity type 
         
-    boundaries = bwboundaries(labeledImage, 8,"noholes")
     
+
     %remove blobs smaller than 5 pixels
     for j = 1:length(unique(labeledImage))-1
         %-1 due to zero in labels
@@ -44,7 +45,9 @@ for a = 1:length(ccvlist)
         end
     end
 
-   
+    % mainly for visualization and add boundary based filters
+    boundaries = bwboundaries(labeledImage, 8,"noholes");
+    
 
     %remove boundaries that mark anything smaller than 5 pixels
     editedbounds = [];
@@ -58,16 +61,16 @@ for a = 1:length(ccvlist)
     end
     
     coloredLabels = label2rgb (labeledImage, 'hsv', 'k', 'shuffle');
-    imshow(coloredLabels)
+    imshow(coloredLabels);
 
     numberOfBoundaries = size(editedbounds, 1); 
-     
+    hold on; 
     
     for k = 1 : numberOfBoundaries
 	    thisBoundary = editedbounds{k}; % Get boundary for this specific blob.
 	    x = thisBoundary(:,2); % Column 2 is the columns, which is x.
 	    y = thisBoundary(:,1); % Column 1 is the rows, which is y.
-	    plot(x, y, 'r-', 'LineWidth', 2); % Plot boundary in red.
+	    plot(x, y, 'w-', 'LineWidth', 2); % Plot boundary in red.
 
     end
 
@@ -75,15 +78,15 @@ for a = 1:length(ccvlist)
     pollenvalues = {};
     for g = 1:(length(unique(labeledImage))-1)
         area = find(labeledImage~=g);
-        labeledImage(area) = 0;     %everything not specifi to pollen grain is 0
-        labeledImage>0 = 1;     %everything about 0 is 1;
+        labeledImage(area) == 0;     %everything not specific to pollen grain is 0
+        labeledImage>0 == 1;     %everything about 0 is 1;
 
         pollenmask = currentim.*labeledImage;
 
-        pollenvalues{g,1} = labeledImage;
+        pollenvalues{g,1} = pollenmask;
     end 
 
-    pollenvalues
+    pollenvalues;
     
     %assign all pollen images to different variables
     p1 = pollenvalues{1,1};
@@ -139,15 +142,16 @@ for a = 1:length(ccvlist)
 %}
 
     %only take the pollen grains that you want and RENAME to 1-9 values
+    %current skipping 7 and 11
     ccvalsp1 = nonzeros(p1);
     ccvalsp2 = nonzeros(p2);
     ccvalsp3 = nonzeros(p3);
     ccvalsp4 = nonzeros(p4);
     ccvalsp5 = nonzeros(p5);
     ccvalsp6 = nonzeros(p6);
-    ccvalsp7 = nonzeros(p7);
-    ccvalsp8 = nonzeros(p8);
-    ccvalsp9 = nonzeros(p9);
+    ccvalsp7 = nonzeros(p8); %skipped 7
+    ccvalsp8 = nonzeros(p9);
+    ccvalsp9 = nonzeros(p10); %exclude 11
 
     %remove outliers in tm values
     ccvalsp1(ccvalsp1 > 8000) = [];

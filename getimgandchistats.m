@@ -7,6 +7,9 @@ segmentorcrop = 2;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGM
 doyouwantimages = 0;    % ONLY USE IF BIN VALUE, 1 = yes display image, 0 = no
 laserclassifiedname = 1; %for use with google drive files with classifed laser power in the file names (1 = true, 0 = false)
 
+if ~(isfolder(folderlocation))
+    folderlocation = 'C:\Users\lociu\Documents\MATLAB\data';
+end
  
  
  % START CODE
