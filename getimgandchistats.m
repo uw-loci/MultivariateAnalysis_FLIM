@@ -1,9 +1,9 @@
 
 % USER INPUTS
-%folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fitFilesHelen';
-folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\neweditednames';
-textfilename = 'blank';   %if file name is "ignore," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name)
-segmentorcrop = 1;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED
+%folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
+folderlocation = 'C:\Users\hwilson23\Documents\GitHub\FLIM_Calibration_Timelapse\data\09-08-22_FLIM\SPC_analyzed\output_data';
+textfilename = 'blank';   %if file name is "blank," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name)
+segmentorcrop = 2;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED, 2 = POLLEN SEGMENTATION
 doyouwantimages = 0;    % ONLY USE IF BIN VALUE, 1 = yes display image, 0 = no
 laserclassifiedname = 1; %for use with google drive files with classifed laser power in the file names (1 = true, 0 = false)
 
@@ -126,11 +126,13 @@ if strcmp(textfilename, 'blank') == 0
     %this will get statistics from the files without the text file data -
     %NO SORTING AND NO ANOVA
 elseif strcmp(textfilename, 'blank') == 1
-       filenamelist = ls(folderlocation);
+       filenamelist = ls(folderlocation)
+
         ccvfiles = [];
         chifiles = [];
         intensityfiles = [];
-       for temp = 1:length(filenamelist)
+       for temp = 1:height(filenamelist)
+           
            ccvlist = contains(filenamelist(temp,:),"value.asc");
            chilist = contains(filenamelist(temp,:),"chi.asc");
            intensitylist = contains(filenamelist(temp,:),"photons.asc");
@@ -152,6 +154,8 @@ elseif strcmp(textfilename, 'blank') == 1
             outputdata = statsfromfilenamesonly(folderlocation, ccvfiles, chifiles, intensityfiles,doyouwantimages,laserclassifiedname)
        elseif segmentorcrop == 0
             outputdata = statsfromcrop(folderlocation, ccvfiles, chifiles, intensityfiles,doyouwantimages,laserclassifiedname)
+       elseif segmentorcrop == 2
+           outputdata = pollensegmentation(folderlocation,ccvfiles,doyouwantimages)
        end
            
 

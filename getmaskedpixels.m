@@ -113,7 +113,7 @@ if imdis == 1
         colorbar;
         subplot(3,2,5), imagesc(intmask);
         axis image
-        title('segmented intensity image')
+        title('thresholded intensity image')
         caxis manual;
         caxis([colorbtm colortop])
         colorbar;					 

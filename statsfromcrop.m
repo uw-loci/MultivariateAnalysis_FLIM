@@ -22,7 +22,7 @@ laserclassification = [];
 if laserclassifiedname == 1
     for i = 1:length(ccvlist)
     nameinfo = strsplit(ccvlist(i),'_');
-    laserclassification = [laserclassification; nameinfo(3)]
+    laserclassification = [laserclassification; nameinfo(3)];
     end 
 else
     disp("laserclassifiedname = 0, no info from file name")
@@ -30,8 +30,8 @@ else
 end
 
 add = 0;
-varTypes = ["string", "string", "string", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-varNames = ["CCVFileName", "CHIFileName", "INTFileName", "LaserClassification", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV"];
+varTypes = ["string","string", "string", "string","double", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
+varNames = ["OriginalFileName","CCVFileName", "CHIFileName", "INTFileName","CFD", "LaserClassification", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV"];
 out = table('Size', [length(ccvlist), length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 for num = 1:length(ccvlist)
     add = add+1
@@ -108,29 +108,47 @@ for num = 1:length(ccvlist)
     boximg = cornerint;       %sanity check for box location??
 
     if imdis == 1
+        
 
+        %show images
         figure()
-        subplot(2,3,1)
+        subplot(3,2,1)
         imshow(intensity)
         rectangle('Position', r , 'EdgeColor', 'r', 'LineWidth', 3, 'LineStyle','-');
+        colorbar
         axis on;
-    
-        title('intensity')
-        subplot(2,3,2) 
+        title('Photons')
+        clim auto
+        colormap default
+        subplot(3,2,5) 
         imshow(chi)
-        title('chi')
-        subplot(2,3,3) 
+        title('CHI')
+        colorbar
+        subplot(3,2,3) 
         imshow(ccv)
-        title('ccv')
-        subplot(2,3,4) 
+        title('CCV')
+        clim auto
+        colormap default
+        colorbar()
+        subplot(3,2,6) 
         imshow(cornerchi)
-        title('cornerchi')
-        subplot(2,3,5)
+        title('CHI Box')
+        clim auto
+        colormap default
+        colorbar
+        subplot(3,2,4)
         imshow(cornerccv)
-        title('cornerccv')
-        subplot(2,3,6)
+        title('CCV Box')
+        clim auto
+        colormap default
+        colorbar
+        subplot(3,2,2)
         imshow(boximg)
-        title(strcat('boximage: TL 1, TR 2, BL 3, BL 4: I =', string(corner)))
+        title(strcat('Photons box'))
+        clim auto
+        colormap default
+        colorbar
+        
     else
         disp("doyouwantimages = 0, no images displayed")
     end 
@@ -144,6 +162,7 @@ for num = 1:length(ccvlist)
     
     %remove outliers in tm values
     ccvals(ccvals > 8000) = [];
+  
     %size(cornerccv)
     %size(ccvals)
     
@@ -161,8 +180,14 @@ for num = 1:length(ccvlist)
     intmedian = median(intvals,'all');
     intstandarddev = std(intvals,0,'all');
 
-    out(num,:) = {ccvlist(num), chilist(num), intensitylist(num), laserclassification(num), cov, imgmean, imgmedian, standarddev, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev};
+    %get regular file name
+    filenamewhole = strsplit(ccvlist(num),'_');
+    filename = strcat(filenamewhole(4),'_', filenamewhole(5));
+    cfd = filenamewhole(2);
+
+    out(num,:) = {filename, ccvlist(num), chilist(num), intensitylist(num), cfd, laserclassification(num), cov, imgmean, imgmedian, standarddev, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev};
     disp('function used: statsfromcrop')
+   
 
 end 
 out

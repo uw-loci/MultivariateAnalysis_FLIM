@@ -3,9 +3,9 @@
 
 %directions to files
 filelocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fitFilesHelen';
-newfolder = 'C:\Users\hwilson23\Documents\UserDataOWS\neweditednames';
-textlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
-textfilename = 'fivedaystwodyes.txt';   
+newfolder = 'C:\Users\hwilson23\Documents\UserDataOWS\neweditedbins';
+textlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\editedbinvalues';
+textfilename = 'editedbinvalues.txt';   
 
 %open files
 info = readtable(strcat(textlocation, '\', textfilename));
@@ -88,7 +88,8 @@ lasercategories = ["L"; "M"; "H"]; %must be in ascending order
                         for j = 1:height(laservals)
                              if height(laservals) ~= height(classify)
                                  disp('ERROR: possible mismatch in number of laser powers used and number of laser power categories')
-                                 return %will stop the code if the user input for laser classification does not have enough categories
+                                 outputdata = [outputdata; sortedpoc(i, 1:5), table("E",'VariableName',"PowerCategory"), sortedpoc(i,7:end);];
+                                 %return %will stop the code if the user input for laser classification does not have enough categories
         
                              else if sortedpoc.LaserPower(i) == laservals(j,:)
                                 %creates the final output table with statistics and
@@ -152,11 +153,11 @@ for i = 1:length(filenames)
     ccvnew = fullfile(newfolder, editedccv(find(contains(editedccv, filenames(i)))));
     
     rindex = find(contains(chifiles, filenames(i)));
-    chicurrent = fullfile(filelocation, chifiles(i));
+    chicurrent = fullfile(filelocation, chifiles(rindex));
     chinew = fullfile(newfolder, editedchi(find(contains(editedchi, filenames(i)))));
     
     rindex = find(contains(intensityfiles, filenames(i)));
-    intcurrent = fullfile(filelocation, intensityfiles(i));
+    intcurrent = fullfile(filelocation, intensityfiles(rindex));
     intnew = fullfile(newfolder, editedint(find(contains(editedint, filenames(i)))));
 
 
@@ -165,6 +166,7 @@ for i = 1:length(filenames)
     copyfile(ccvcurrent, ccvnew)
     copyfile(chicurrent, chinew)
     copyfile(intcurrent, intnew)
+    disp('done')
 
 end 
 
