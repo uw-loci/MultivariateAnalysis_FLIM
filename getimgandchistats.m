@@ -122,7 +122,7 @@ if strcmp(textfilename, 'blank') == 0
         end 
         
         %   OUTPUTS
-        outputdata %final table with statistics and laserpower classification column
+        outputdata ;%final table with statistics and laserpower classification column
         disp(imgmessage) %tells whether images were printed or not
 
         %%
@@ -149,7 +149,7 @@ elseif strcmp(textfilename, 'blank') == 1
            end 
 
        end 
-       ccvfiles
+       ccvfiles;
 
        %%%add if statement to call crop if crop desired 
 
@@ -158,7 +158,13 @@ elseif strcmp(textfilename, 'blank') == 1
        elseif segmentorcrop == 0
             outputdata = statsfromcrop(folderlocation, ccvfiles, chifiles, intensityfiles,doyouwantimages,laserclassifiedname)
        elseif segmentorcrop == 2
-           outputdata = pollensegmentation(folderlocation,ccvfiles,doyouwantimages)
+    
+           % Elapsed time is 6.156031 seconds.
+           outputdata = pollensegmentation(folderlocation,ccvfiles,doyouwantimages);
+           
+           % Elapsed time is 2.217199 seconds.
+           outputdata2 = pollensegmentation2(folderlocation,ccvfiles);
+
        end
            
 

@@ -8,7 +8,7 @@ varTypes = ["string","double","double", "double", "double", "double","double","d
 varNames = ["CCVFileName","Timepoint","CCVMeanp1","CCVMeanp2","CCVMeanp3","CCVMeanp4","CCVMeanp5","CCVMeanp6","CCVMeanp7","CCVMeanp8","CCVMeanp9", ...
     "CCVMedianp1","CCVMedianp2","CCVMedianp3","CCVMedianp4","CCVMedianp5","CCVMedianp6","CCVMedianp7","CCVMedianp8","CCVMedianp9", ...
     "CCVSTDEVp1", "CCVSTDEVp2","CCVSTDEVp3","CCVSTDEVp4","CCVSTDEVp5","CCVSTDEVp6","CCVSTDEVp7","CCVSTDEVp8","CCVSTDEVp9", ...
-    "COVp1", "COVp2","COVp3","COVp4","COVp5","COVp6","COVp7","COVp8","COVp9",];
+    "COVp1", "COVp2","COVp3","COVp4","COVp5","COVp6","COVp7","COVp8","COVp9"];
 out = table('Size', [length(ccvlist), length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 
 for a = 1:length(ccvlist)
@@ -79,10 +79,13 @@ for a = 1:length(ccvlist)
     pollenvalues = {};
     for g = 1:(length(unique(labeledImage))-1)
         area = find(labeledImage~=g);
-        labeledImage(area) == 0;     %everything not specific to pollen grain is 0
-        labeledImage>0 == 1;     %everything about 0 is 1;
 
-        pollenmask = currentim.*labeledImage;
+        lm= labeledImage;
+
+        lm(area) = 0;     %everything not specific to pollen grain is 0
+        lm(lm>0) = 1;     %everything about 0 is 1;
+
+        pollenmask = currentim.*lm;
 
         pollenvalues{g,1} = pollenmask;
     end 
