@@ -15,7 +15,10 @@ for a = 1:length(ccvlist)
     add = add+1
     currentfile = strcat(folder,'\',ccvlist(a));
     currentim = dlmread(currentfile);
-    %figure()
+    
+    if imdis==1
+    figure()
+    end
     %imshow(currentim)
     
     %axis on
@@ -65,17 +68,21 @@ for a = 1:length(ccvlist)
 
     %coloredLabels = label2rgb (labeledImage, 'hsv', 'k', 'shuffle');
     %imshow(coloredLabels);
+
+    
+    
+    if imdis==1
     cm = [0 0 0; jet(12)];
-    %imagesc(labeledImage);colormap(cm);colorbar();
+    imagesc(labeledImage);colormap(cm);colorbar();
     numberOfBoundaries = size(boundaries, 1); 
     hold on; 
-    
     for k = 1 : numberOfBoundaries
 	    thisBoundary = boundaries{k}; % Get boundary for this specific blob.
 	    x = thisBoundary(:,2); % Column 2 is the columns, which is x.
 	    y = thisBoundary(:,1); % Column 1 is the rows, which is y.
-	    %plot(x, y, 'w-', 'LineWidth', 1); % Plot boundary in red.
+	    plot(x, y, 'w-', 'LineWidth', 1); % Plot boundary in red.
 
+    end
     end
     
     %separate pollen images
@@ -223,7 +230,7 @@ for a = 1:length(ccvlist)
         sdevp1, sdevp2,sdevp3,sdevp4,sdevp5,sdevp6,sdevp7,sdevp8,sdevp9, ...
         covp1, covp2, covp3, covp4, covp5, covp6, covp7, covp8, covp9};
 
-    if imdis == 1
+    if imdis == 2
         subplot(5,2,1)
         imshow(currentim)
         clim auto

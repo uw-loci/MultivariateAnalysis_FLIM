@@ -160,7 +160,7 @@ elseif strcmp(textfilename, 'blank') == 1
        elseif segmentorcrop == 2
     
            % Elapsed time is 6.156031 seconds.
-           outputdata = pollensegmentation(folderlocation,ccvfiles,doyouwantimages);
+           outputdata = pollensegmentation(folderlocation,ccvfiles,1);
            
            % Elapsed time is 2.217199 seconds.
            outputdata2 = pollensegmentation2(folderlocation,ccvfiles);
