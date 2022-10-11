@@ -21,3 +21,11 @@ Determination of Coefficient of Variation in complex FLIM datasets under differe
 - Folder-based separation for project milestones (update .gitignore)
 - Examine the cause for segregation in High CCV values
 - Refactor CCV to tau-mean
+
+### Steps Oct 11, 2022
+ - bins in dye-solution (why certain high-laserpower values)
+ - cells and morphology based covariance analysis
+ - pollen grain: increase number of pixels 
+				: additional test to identify why low lifetime pollen has high cov between files
+ - dye solution : quenching of Rh110.
+ - 
