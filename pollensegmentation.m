@@ -81,13 +81,17 @@ for a = 1:length(ccvlist)
     %separate pollen images
     pollenvalues = {};
     for g = 1:(length(unique(labeledImage))-1)
-        area = find(labeledImage~=g);
+        
+        %area = find(labeledImage~=g);
 
         lm= labeledImage;
-        for h = 1:length(area)
-        lm(area(h)) = 0;     %everything not specific to pollen grain is 0
-        end 
-        lm(lm>0) = 1;     %everything above 0 is 1;
+        area = lm==g ;
+
+        %for h = 1:length(area)
+        %lm(area(h)) = 0;     %everything not specific to pollen grain is 0
+        %end 
+        lm(area)  = 1;
+        lm(~area) = 0;     %everything above 0 is 1;
 
         pollenmask = currentim.*lm;
 

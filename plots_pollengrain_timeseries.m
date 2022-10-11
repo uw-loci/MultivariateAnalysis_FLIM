@@ -4,7 +4,7 @@
 outputdata_cell = table2cell(outputdata2);
 
 m=['+' , 'o' , '*' , '.' , 'x' , 'square' , 'diamond' , 'v' ,'^' , '>' , '<' , 'pentagram' , 'hexagram' ] ;
-c = []
+%c = [];
     figure()
     hold on;
 for pollen_index = 1:npollen
