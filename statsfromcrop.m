@@ -1,4 +1,4 @@
-function [out] = statscroppedfiles(folder, ccvlist, chilist, intensitylist, imdis,laserclassifiedname) 
+function [out] = statscroppedfiles(folder, ccvlist, chilist, intensitylist) 
 
 
 %THIS FUNCTION IS DESIGNED TO USE CROPPED SEGMENTS OF THE IMAGE AND
@@ -16,22 +16,10 @@ else
     return
 end 
 
-%will get added information out of the file names, such as laser power
-%classification
-laserclassification = [];
-if laserclassifiedname == 1
-    for i = 1:length(ccvlist)
-    nameinfo = strsplit(ccvlist(i),'_');
-    laserclassification = [laserclassification; nameinfo(3)];
-    end 
-else
-    disp("laserclassifiedname = 0, no info from file name")
-    laserclassification = zeros(length(ccvlist))
-end
 
 add = 0;
-varTypes = ["string","string", "string", "string","double", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-varNames = ["OriginalFileName","CCVFileName", "CHIFileName", "INTFileName","CFD", "LaserClassification", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV"];
+varTypes = ["string","string", "string", "string","double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
+varNames = ["OriginalFileName","CCVFileName", "CHIFileName", "INTFileName","CFD", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV"];
 out = table('Size', [length(ccvlist), length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 for num = 1:length(ccvlist)
     add = add+1
@@ -106,53 +94,6 @@ for num = 1:length(ccvlist)
     
     
     boximg = cornerint;       %sanity check for box location??
-
-    if imdis == 1
-        
-
-        %show images
-        figure()
-        subplot(3,2,1)
-        imshow(intensity)
-        rectangle('Position', r , 'EdgeColor', 'r', 'LineWidth', 3, 'LineStyle','-');
-        colorbar
-        axis on;
-        title('Photons')
-        clim auto
-        colormap default
-        subplot(3,2,5) 
-        imshow(chi)
-        title('CHI')
-        colorbar
-        subplot(3,2,3) 
-        imshow(ccv)
-        title('CCV')
-        clim auto
-        colormap default
-        colorbar()
-        subplot(3,2,6) 
-        imshow(cornerchi)
-        title('CHI Box')
-        clim auto
-        colormap default
-        colorbar
-        subplot(3,2,4)
-        imshow(cornerccv)
-        title('CCV Box')
-        clim auto
-        colormap default
-        colorbar
-        subplot(3,2,2)
-        imshow(boximg)
-        title(strcat('Photons box'))
-        clim auto
-        colormap default
-        colorbar
-        
-    else
-        disp("doyouwantimages = 0, no images displayed")
-    end 
-    
     
     %get nonzero pixel values from cropped image to use for statistics
     
@@ -160,8 +101,9 @@ for num = 1:length(ccvlist)
     chivals = nonzeros(cornerchi);
     intvals = nonzeros(cornerint);
     
-    %remove outliers in tm values
+    %remove outliers in tm and chi values
     ccvals(ccvals > 8000) = [];
+    ccvals(chivals>4) = [];
   
     %size(cornerccv)
     %size(ccvals)
@@ -181,11 +123,12 @@ for num = 1:length(ccvlist)
     intstandarddev = std(intvals,0,'all');
 
     %get regular file name
-    filenamewhole = strsplit(ccvlist(num),'_');
-    filename = strcat(filenamewhole(4),'_', filenamewhole(5));
-    cfd = filenamewhole(2);
-
-    out(num,:) = {filename, ccvlist(num), chilist(num), intensitylist(num), cfd, laserclassification(num), cov, imgmean, imgmedian, standarddev, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev};
+    %filenamewhole = strsplit(ccvlist(num),'_');
+    %filename = strcat(filenamewhole(4),'_', filenamewhole(5));
+    %cfd = filenamewhole(2);
+    filename = ccvlist(num);
+    cfd = "null"
+    out(num,:) = {filename, ccvlist(num), chilist(num), intensitylist(num), cfd, cov, imgmean, imgmedian, standarddev, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev};
     disp('function used: statsfromcrop')
    
 

@@ -1,4 +1,4 @@
-function [out] = statsfromfilenamesonly(folder, ccvlist, chilist, intensitylist, imdis, laserclassifiedname) 
+function [out] = statsfromfilenamesonly(folder, ccvlist, chilist, intensitylist) 
 %THIS FUNCTION IS DESIGNED TO APPLY ONLY THE CHI SQ MASK TO THE EXPORTED SPCIMAGE
 %FILES AND RETURN STATISTICS FOR EACH FILE. WORKS WITHOUT THE TEXT FILE
 %INPUTS BUT HAS NO SORTING OF THE DATA
@@ -14,23 +14,11 @@ else
     return
 end 
 
-%will get added information out of the file names, such as laser power
-%classification
-laserclassification = [];
-if laserclassifiedname == 1
-    for i = 1:length(ccvlist)
-    nameinfo = strsplit(ccvlist(i),'_');
-    laserclassification = [laserclassification; nameinfo(3)]
-    end 
-else
-    disp("laserclassifiedname = 0, no info from file name")
-end
-
 
 %loop creates mask and get statistics for each file, displays images if
 %needed
-varTypes = ["string", "string", "string", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-varNames = ["CCVFileName", "CHIFileName", "INTFileName", "LaserClassification", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV"];
+varTypes = ["string", "string", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
+varNames = ["CCVFileName", "CHIFileName", "INTFileName", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV"];
 out = table('Size', [length(ccvlist), length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
 
 add = 0;
@@ -119,66 +107,11 @@ for num = 1:length(ccvlist)
     intmedian = median(intvals,'all');
     intstandarddev = std(intvals,0,'all');
 
-    out(num,:) = {ccvlist(num), chilist(num), intensitylist(num), laserclassification(num), cov, imgmean, imgmedian, standarddev, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev};
+    out(num,:) = {ccvlist(num), chilist(num), intensitylist(num), cov, imgmean, imgmedian, standarddev, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev};
     disp('function used: statsfromfilenamesonly')
 
-    %displays images if needed 
-    if imdis == 1
-            
-            figure()
-            subplot(3,2,1), imagesc(flipped);
-            axis image
-            title('flipped intensity image (no bin)')
-            colorbar();				   
-           
-            %set color bar limits
-            colortop = max(max(binned)); %based on max documentation
-            colorbtm = min(min(binned));
-            caxis manual;
-            caxis([colorbtm colortop])
-                    
-            subplot(3,2,3), imagesc(binned);
-            axis image
-            title('binned intensity image')
-            colorbar;
-            subplot(3,2,5), imagesc(intmask);
-            axis image
-            title('segmented intensity image')
-            caxis manual;
-            caxis([colorbtm colortop])
-            colorbar;					 
-            
-            subplot(3,2,2), imagesc(totalmask)
-            axis image
-            title('total mask of intensity image')
-            colorbar;
-            
-            subplot(3,2,4), imagesc(colorfile);
-            axis image
-            title('original color coded value image')
-            top2 = max(max(colorfile));
-            btm2 = min(min(colorfile));
-            caxis manual;
-            caxis([btm2 top2]);
-            colorbar;
-            
-            subplot(3,2,6), imagesc(colorseg);
-            axis image
-            title('color coded image with mask')
-            caxis manual;
-            caxis([btm2 top2]);
-            colorbar;
-            
-            imageprint = ('images displayed');
-            
-        elseif imdis == 0
-            imageprint = ('doyouwantimage = 0, no image display');
-        else
-            imageprint = ('doyouwantimage ERROR');
     
     end 
-    
-    
-
+   
 
 end
