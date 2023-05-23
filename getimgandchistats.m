@@ -1,11 +1,12 @@
 
 % USER INPUTS
 %folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
-folderlocation = 'C:\Users\hwilson23\Documents\GitHub\FLIM_Calibration_Timelapse\data\09-08-22_FLIM\SPC_analyzed\output_data';
+%folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fluorescein_analysis';
+folderlocation = 'C:\Users\hwilson23\Documents\Projects\Fluorescein_Quenching\fluorescein_analysis';
 textfilename = 'blank';   %if file name is "blank," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name)
-segmentorcrop = 2;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED, 2 = POLLEN SEGMENTATION
+segmentorcrop = 0;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED, 2 = POLLEN SEGMENTATION
 doyouwantimages = 0;    % ONLY USE IF BIN VALUE, 1 = yes display image, 0 = no
-laserclassifiedname = 1; %for use with google drive files with classifed laser power in the file names (1 = true, 0 = false)
+laserclassifiedname = 0; %for use with google drive files with classifed laser power in the file names (1 = true, 0 = false)
 
 if ~(isfolder(folderlocation))
     folderlocation = 'C:\Users\lociu\Documents\MATLAB\data';
@@ -94,6 +95,7 @@ if strcmp(textfilename, 'blank') == 0
                         for j = 1:height(laservals)
                              if height(laservals) ~= height(classify)
                                  disp('ERROR: possible mismatch in number of laser powers used and number of laser power categories')
+                                 
                                  return %will stop the code if the user input for laser classification does not have enough categories
         
                              else if sortedpoc.LaserPower(i) == laservals(j,:)
@@ -160,7 +162,7 @@ elseif strcmp(textfilename, 'blank') == 1
        elseif segmentorcrop == 2
     
            % Elapsed time is 6.156031 seconds.
-           outputdata = pollensegmentation(folderlocation,ccvfiles,1);
+           [outputdata,pxovertime,chiovertime] = pollensegmentation(folderlocation,ccvfiles,chifiles,doyouwantimages);
            
            % Elapsed time is 2.217199 seconds.
            outputdata2 = pollensegmentation2(folderlocation,ccvfiles);
@@ -189,20 +191,20 @@ end
 
 
 
-function  [imagefile, imgmean, imgmedian, standarddev, cov, ccvals, chisquaredvals, imprint, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev] = getmeanandchi(imagefile, location, bin, imagetoggle)
+function  [imagefile, imgmean, imgmedian, standarddev, cov, ccvals, chisquaredvals, imprint, chimean, chimedian, chistandarddev, intmean, intmedian, intstandarddev] = getmeanandchi(imagefile, location, bin)
 %THIS FUNCTION IS DESIGNED TO USE THE SPCIMAGE EXPORT FILES (.tif only) AND CREATE
 %STATISTICS FOR COLOR CODED VALUE IMAGE, CHI SQUARED, AND INTENSITY IMAGE
 %IMPORTANT: filename in folder should have no spaces, use gitbash and asc
 %to tif file to change SPCImage output 
 %(EX.) "color coded value.asc" should be "colorcodedvalue.tif"
 
-intensityname = strcat(location, '\', imagefile, '_intensity_image.tif');
+intensityname = strcat(location, '\', imagefile, '_intensity_image.tif')
 
-colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif'); 
-chiname = strcat(location, '\', imagefile, '_chi.tif');
+colorname = strcat(location, '\', imagefile, '_colorcodedvalue.tif') 
+chiname = strcat(location, '\', imagefile, '_chi.tif')
 
 %for each file, calls "get masked pixels" to apply the mask to the images
-[ccvals, chisquaredvals, intvals, imprint] = getmaskedpixels(intensityname, colorname, chiname, bin, imagetoggle);
+[ccvals, chisquaredvals, intvals, imprint] = getmaskedpixels(intensityname, colorname, chiname, bin);
 
 %calculate statistics for each file type
 imgmean = mean(ccvals,'all');  %check for single value
