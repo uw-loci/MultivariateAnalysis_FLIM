@@ -12,6 +12,8 @@ if length(ccvlist) == length (chilist) && length (intensitylist) == length(ccvli
 else
     disp("ERROR: Lengths of file lists may differ for each type of file.")
     disp(["File numbers: CCV ", length(ccvlist), " , Chi ",length(chilist), " , Photons ",length(intensitylist)])
+    ccvlist
+    chilist
     
     return
 end 
