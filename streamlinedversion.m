@@ -1,3 +1,21 @@
+% Script to analyze dye files - streamlined
+
+%input - folder location and the name of the text file if data sorting
+%desired
+
+% USER INPUTS
+%folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\allanalysisdata';
+%folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fluorescein_analysis';
+folderlocation = 'C:\Users\hwilson23\Documents\Projects\Fluorescein_Quenching\fluorescein_analysis';
+%textfilename = 'blank';   %if file name is "blank," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name)
+%textfilename = 'data3withcoverslip.txt'
+segmentorcrop = 0;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED
+textfilename
+if ~(isfolder(folderlocation))
+    folderlocation = 'C:\Users\lociu\Documents\MATLAB\data';
+end
+ 
+
  % START CODE
 
 if strcmp(textfilename, 'blank') == 0 
