@@ -12,7 +12,7 @@
 folderlocation = 'C:\Users\hwilson23\Documents\Projects\Fluorescein_Quenching\fluorescein_analysis'; 
 %textfilename = 'blank'; %if file name is "blank," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name) 
 %textfilename = 'data3withcoverslip.txt' 
-textfilename = 'fluoresceindetailsv2.txt'
+%textfilename = 'fluoresceindetailsv2.txt'
 
 segmentorcrop = 0; % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED 
 textfilename 
