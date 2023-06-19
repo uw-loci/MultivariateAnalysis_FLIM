@@ -8,9 +8,10 @@
 %folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fluorescein_analysis';
 folderlocation = 'C:\Users\hwilson23\Documents\Projects\Fluorescein_Quenching\fluorescein_analysis';
 %textfilename = 'blank';   %if file name is "blank," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name)
-%textfilename = 'data3withcoverslip.txt'
+textfilename = 'fluoresceindetailsv2.txt'
 segmentorcrop = 0;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED
 textfilename
+addpath('C:\Users\hwilson23\Documents\MATLAB\gramm-master\gramm-master')
 if ~(isfolder(folderlocation))
     folderlocation = 'C:\Users\lociu\Documents\MATLAB\data';
 end
@@ -42,7 +43,7 @@ if strcmp(textfilename, 'blank') == 0
         %create empty table for data outputs
         add = 0;
         varTypes = ["cell", "double", "double", "double", "double", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-        varNames = ["FileName", "FluorescentDyeAnalyzed", "DayAnalyzed", "ROIAnalyzed", "LaserPowerAnalyzed", "PowerCategory", "BinValue", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "IntensityMean", "IntensityMedian", "IntensitySTDEV", "ColletionTime(sec)"];
+        varNames = ["FileName", "FluorescentDyeAnalyzed", "DayAnalyzed", "ROIAnalyzed", "LaserPowerAnalyzed", "PowerCategory", "BinValue", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "IntensityMean", "IntensityMedian", "IntensitySTDEV", "ColletionTime"];
         infomeanchi = table('Size', [numfile, length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
         close all;
         
@@ -183,6 +184,15 @@ else
 end
 filename = 'outputdata.xlsx';
 writetable(outputdata,filename , 'Sheet', 1, 'FileType', 'spreadsheet');
+
+
+%%
+%graphing
+figure()
+gr = gramm('x', outputdata.KIConcen, 'y', outputdata.CCVCoV,'subset', string(outputdata.ManualCFDClass) == 'h' & outputdata.CollectionTime == 45)
+
+gr.geom_point()
+gr.draw()
 
 
 %%
