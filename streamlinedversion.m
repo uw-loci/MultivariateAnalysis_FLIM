@@ -8,7 +8,7 @@
 %folderlocation = 'C:\Users\hwilson23\Documents\UserDataOWS\fluorescein_analysis';
 folderlocation = 'C:\Users\hwilson23\Documents\Projects\Fluorescein_Quenching\fluorescein_analysis';
 %textfilename = 'blank';   %if file name is "blank," code works with google drive folder download, ELSE specify a text file name (make sure color coded value files have no space in name)
-textfilename = 'fluoresceindetailsv2.txt'
+textfilename = 'fluoresceindetailsv3.txt'
 segmentorcrop = 0;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED
 textfilename
 addpath('C:\Users\hwilson23\Documents\MATLAB\gramm-master\gramm-master')
@@ -43,7 +43,7 @@ if strcmp(textfilename, 'blank') == 0
         %create empty table for data outputs
         add = 0;
         varTypes = ["cell", "double", "double", "double", "double", "string", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double", "double"];
-        varNames = ["FileName", "FluorescentDyeAnalyzed", "DayAnalyzed", "ROIAnalyzed", "LaserPowerAnalyzed", "PowerCategory", "BinValue", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "IntensityMean", "IntensityMedian", "IntensitySTDEV", "ColletionTime"];
+        varNames = ["FileName", "FluorescentDyeAnalyzed", "DayAnalyzed", "ROIAnalyzed", "LaserPowerAnalyzed", "PowerCategory", "BinValue", "CCVCoV", "CCVMean", "CCVMedian", "CCVSTDEV", "CHIMean", "CHIMedian", "CHISTDEV", "PhotonsMean", "PhotonsMedian", "PhotonsSTDEV", "ColletionTime"];
         infomeanchi = table('Size', [numfile, length(varNames)],'VariableTypes',varTypes, 'VariableNames',varNames);
         close all;
         
@@ -190,11 +190,99 @@ writetable(outputdata,filename , 'Sheet', 1, 'FileType', 'spreadsheet');
 %graphing
 figure()
 gr = gramm('x', outputdata.KIConcen, 'y', outputdata.CCVCoV,'subset', string(outputdata.ManualCFDClass) == 'h' & outputdata.CollectionTime == 45)
+% Set appropriate names for legends
+gr.set_names('x','KIConcen','y','CV')
+gr.set_title('KIConcen vs CV, high photon rate, 45sec files')
+gr.stat_boxplot()
+gr.draw()
 
+figure()
+gr = gramm('x', outputdata.KIConcen, 'y', outputdata.CCVCoV,'color', outputdata.Day, 'subset', string(outputdata.ManualCFDClass) == 'h' & outputdata.CollectionTime == 45)
+% Set appropriate names for legends
+gr.set_names('x','KIConcen','y','CV')
+gr.set_title('KIConcen vs CV, high photon rate, 45sec files')
 gr.geom_point()
 gr.draw()
 
+figure()
+gr = gramm('x', outputdata.KIConcen, 'y', outputdata.CCVCoV,'color', outputdata.PhotonsMean, 'subset', string(outputdata.ManualCFDClass) == 'h' & outputdata.CollectionTime == 45 & outputdata.Day == 20230621)
+% Set appropriate names for legends
+gr.set_names('x','KIConcen','y','CV')
+gr.set_title('20230621 only, KIConcen vs CV, color photon rate, high photon rate, 45sec files')
+gr.geom_point()
+gr.draw()
 
+figure()
+gr = gramm('x', outputdata.LaserPower,'y', outputdata.CCVCoV,'subset', string(outputdata.KIValue) == 'none' & outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('x','LaserPower','y','CV')
+%Set figure title
+gr.set_title('Laser Power vs CV, fluorescein unquenched, 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('x', outputdata.LaserPower,'y', outputdata.CCVCoV,'subset', outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('x','LaserPower','y','CV')
+%Set figure title
+gr.set_title('Laser Power vs CV, all fluorescein data with 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('x', outputdata.PhotonsMedian,'y', outputdata.CCVCoV,'subset', string(outputdata.KIValue) == 'none' & outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('x','PhotonsMedian','y','CV')
+%Set figure title
+gr.set_title('PhotonsMedian vs CV, fluorescein unquenched, 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('x', outputdata.PhotonsMedian,'y', outputdata.CCVCoV,'color',outputdata.KIConcen,'subset', outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('x','PhotonsMedian','y','CV')
+%Set figure title
+gr.set_title('PhotonsMedian vs CV, all fluorescein data with 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('x', outputdata.CHIMean,'y', outputdata.CCVCoV,'subset', outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('x','Chi Mean','y','CV')
+%Set figure title
+gr.set_title('Chi Mean vs CV, all fluorescein data with 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('y', outputdata.CHIMean,'x', outputdata.PhotonsMean, 'color', outputdata.CCVCoV, 'subset', outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('y','Chi Mean','x','Photons Mean')
+%Set figure title
+gr.set_title('Chi Mean vs Photons Mean, all fluorescein data with 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('x', outputdata.KIConcen,'y', outputdata.CHIMean,'subset', outputdata.CollectionTime == 45)
+gr.stat_boxplot()
+% Set appropriate names for legends
+gr.set_names('x','KI Concentration','y','Chi Mean')
+%Set figure title
+gr.set_title('KI Concen vs Chi Mean, all fluorescein data with 45sec files')
+gr.draw()
+
+figure()
+gr = gramm('x', outputdata.CCVMean,'y', outputdata.CCVCoV,'color',outputdata.KIConcen, 'subset', outputdata.CollectionTime == 45)
+gr.geom_point()
+% Set appropriate names for legends
+gr.set_names('x','Lifetime Mean','y','CV')
+%Set figure title
+gr.set_title('Lifetime Mean vs CV, all fluorescein data with 45sec files')
+gr.draw()
 %%
 
 
