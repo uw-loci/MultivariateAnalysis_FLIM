@@ -2,7 +2,7 @@
 
 Determination of Coefficient of Variation in complex FLIM datasets under different imaging conditions
 Main code is run through "streamlinedversion.m." Requries text file input with headers:
-ImageFile	KIValue	KIConcen	ManualCFDClass	FluorescentDye	Day	ROI	LaserPower	BinNumber	CollectionTime
+ImageFile,	KIValue,	KIConcen,	ManualCFDClass,	FluorescentDye,	Day,	ROI,	LaserPower,	BinNumber, CollectionTime.
 Not all columns must contain information.
 
 ## Results
