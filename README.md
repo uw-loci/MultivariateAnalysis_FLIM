@@ -5,6 +5,7 @@ Determination of Coefficient of Variation in complex FLIM datasets under differe
 ## Results
 
 - **Large CV is associated with long-lifetime FLIM data**
+  
 ![image](https://github.com/uw-loci/MultivariateAnalysis_FLIM/assets/111527077/6bfc9655-d9c9-485f-924f-8459dc3978d9)
 
 ## To Run Code (20240320)
