@@ -2,10 +2,15 @@
 
 %%add path to python script if needed as well as specify python env or 
 % point to a conda env
-addpath('H:\firefox_downloads\');
+addpath('H:\Projects\Fluorescein_Quenching\slimdata_analysis');
 pyenv('Version','C:\Users\hwilson23\.conda\envs\naparienv\python.exe');
 
-%specify parameters for crlb function tau (see other code for detail)
+%load personal data to add to plot with crlb
+data = load('H:\Projects\Fluorescein_Quenching\slimdata_analysis\datatable_CCVMeanandCV.mat');
+meanlifetime = data.datatable(:,1);
+CVoflifetime = data.datatable(:,2);
+
+%specify parameters for crlb function tau (see python code for details)
 lifetimes = linspace(0.1,5);
 n = 2000;
 T = 12.5;
@@ -20,12 +25,7 @@ for i = 1:length(lifetimes)
 
 end
 
-%% plot data, must provide the lifetime values and CV data to add to crlb plot
-data = load('H:\Projects\Fluorescein_Quenching\slimdata_analysis\datatable_CCVMeanandCV.mat');
-meanlifetime = data.datatable(:,1);
-CVoflifetime = data.datatable(:,2);
-
-
+%% plot data, must provide the lifetime values and CV data above to add to crlb plot
 figure()
 scatter(meanlifetime, CVoflifetime)
 hold on
