@@ -29,7 +29,7 @@ end
 figure()
 scatter(meanlifetime, CVoflifetime)
 hold on
-scatter(lifetimes,sqrt(crlb_result)./lifetimes) %crlb is variance^2, so changing values to plot CV for crlb
+plot(lifetimes,sqrt(crlb_result)./lifetimes) %crlb is variance^2, so changing values to plot CV for crlb
 
 title('crlb with CV data');
 xlabel('Lifetime (ns)')
