@@ -4,28 +4,16 @@ Determination of Coefficient of Variation in complex FLIM datasets under differe
 
 ## Results
 
-- **Large Cov is strongly associated with long-lifetime FLIM data**
+- **Large CV is associated with long-lifetime FLIM data**
+![image](https://github.com/uw-loci/MultivariateAnalysis_FLIM/assets/111527077/6bfc9655-d9c9-485f-924f-8459dc3978d9)
 
-## Goals
+## To Run Code (20240320)
+ - Download python code "crlb.py" written by Christoph Thiele (2021)
+ - 	has been edited from the original repository (https://github.com/thielec/CRLB_FL-SMLM/blob/main/crlb.py)
+   	to include a call to the tau function
+ - Download  and run matlab code "plot_dye_crlb_cv.m" to generate plot
+ - 	specify any folders or python environments - mpmath is required to run the python code
+ - 	specify parameters to evaluate crlb (see python code for details)
+ - 	load experimental data (mean lifetime and CV of values)
 
-- Compare two  distinct lifetime distributions over time/ days
-- Compare many distinct lifetimes over singleday/ time-lapse
-- Compare live changes using a quencher
-  - Translate result into biexponential dataset and biological samples
-  - Examine acqusition parameters / Test pile-up correction
-  - Examine solutions both hardware and software  
-
-## Todo List
-
-- Make R-project
-- Folder-based separation for project milestones (update .gitignore)
-- Examine the cause for segregation in High CCV values
-- Refactor CCV to tau-mean
-
-### Steps Oct 11, 2022
- - bins in dye-solution (why certain high-laserpower values)
- - cells and morphology based covariance analysis
- - pollen grain: increase number of pixels 
-				: additional test to identify why low lifetime pollen has high cov between files
- - dye solution : quenching of Rh110.
- - 
+ - 	
