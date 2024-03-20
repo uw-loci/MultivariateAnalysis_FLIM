@@ -16,5 +16,3 @@ Determination of Coefficient of Variation in complex FLIM datasets under differe
  - 	specify any folders or python environments - mpmath is required to run the python code
  - 	specify parameters to evaluate crlb (see python code for details)
  - 	load experimental data (mean lifetime and CV of values)
-
- - 	
