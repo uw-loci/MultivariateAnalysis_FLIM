@@ -1,9 +1,12 @@
 # Multi-variate Analysis for FLIM 
 
-Determination of Coefficient of Variation in complex FLIM datasets under different imaging conditions
-Main code is run through "streamlinedversion.m." Requries text file input with headers:
-ImageFile,	KIValue,	KIConcen,	ManualCFDClass,	FluorescentDye,	Day,	ROI,	LaserPower,	BinNumber, CollectionTime.
-Not all columns must contain information.
+Determination of coefficient of variation in complex FLIM datasets with various lifetimes.
+Main code for getting lifetime statistics is run through "MAIN_streamlinedversion.m." Requries text file input with headers:
+ImageFile,	KIConcen,	FluorescentDye,	Day,	ROI,	LaserPower,	BinNumber, CollectionTime. Not all columns must contain information.
+The associated image files should have .asc or .tif files of mean lifetime (or colorcodedvalue from SPCImage analysis), 
+photon count, and/or chi-squared values. 
+
+The gramm data visualization toolbox is used for figure creation. 
 
 ## Results
 
@@ -11,7 +14,7 @@ Not all columns must contain information.
   
 ![image](https://github.com/uw-loci/MultivariateAnalysis_FLIM/assets/111527077/6bfc9655-d9c9-485f-924f-8459dc3978d9)
 
-## To Run Code (20240320)
+## To Run CRLB Code (20240320)
  - _Download python code "crlb.py" written by Christoph Thiele (2021)_
  - 	has been edited from the original repository (https://github.com/thielec/CRLB_FL-SMLM/blob/main/crlb.py)
    	to include a call to the tau function
