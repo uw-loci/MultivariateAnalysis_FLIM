@@ -6,7 +6,7 @@
 
 folderlocation = 'H:\Projects\Fluorescein_Quenching\slimdata_analysis';
 
-textfilename = 'H:\Projects\Fluorescein_Quenching\slimdata_analysis\slim_fludata_zposNOTmoved.txt'
+textfilename = 'H:\Projects\Fluorescein_Quenching\slimdata_analysis\flu_datasummary_20240605.txt'
 
 segmentorcrop = 0;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED
 
