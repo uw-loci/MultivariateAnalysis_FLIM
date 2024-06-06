@@ -7,8 +7,8 @@ pyenv('Version','C:\Users\hwilson23\.conda\envs\naparienv\python.exe');
 
 %load personal data to add to plot with crlb
 data = load('H:\Projects\Fluorescein_Quenching\slimdata_analysis\datatable_CCVMeanandCV.mat');
-meanlifetime = data.datatable(:,1);
-CVoflifetime = data.datatable(:,2);
+meanlifetime = data.data.datatable(:,1);
+CVoflifetime = data.data.datatable(:,2);
 
 %specify parameters for crlb function tau (see python code for details)
 lifetimes = linspace(0.1,5);
