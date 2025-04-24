@@ -4,9 +4,9 @@
 
 % USER INPUTS
 
-folderlocation = 'H:\Projects\Fluorescein_Quenching\slimdata_analysis';
+folderlocation = 'E:\Projects\Fluorescein_Quenching\slimdata_analysis_40xonly';;
 
-textfilename = 'H:\Projects\Fluorescein_Quenching\slimdata_analysis\flu_datasummary_20240605.txt'
+textfilename = 'E:\Projects\Fluorescein_Quenching\slimdata_analysis\slim_fludata_zposNOTmoved_40xonlybothdays.txt'
 
 segmentorcrop = 0;    % DETERMINES IF THRESHOLDED OR CROPPED STATISTICS 1 = SEGMENT, 0 = CROPPED
 
@@ -240,22 +240,22 @@ function  [imagefile, imgmean, imgmedian, standarddev, cov, ccvals, chisquaredva
     intvals = nonzeros(cornerint);
     
     %remove outliers in tm and chi values
-    ccvals(ccvals > 8000) = [];
-    ccvals(chisquaredvals>4) = [];
+    ccvals(ccvals > 8000) = NaN;
+    ccvals(chisquaredvals>4) = NaN;
 
     %calculate statistics for each file type
-    imgmean = mean(ccvals,'all');  %check for single value
-    imgmedian = median(ccvals,'all');
-    standarddev = std(ccvals,0, 'all');        % w = 0 to normalize by N-1 (default option)
+    imgmean = mean(ccvals,'all','omitmissing');  %check for single value
+    imgmedian = median(ccvals,'all','omitmissing');
+    standarddev = std(ccvals,0, 'all','omitmissing');        % w = 0 to normalize by N-1 (default option)
     cov = standarddev/imgmean;
     
-    chimean = mean(chisquaredvals, 'all');
-    chimedian = median(chisquaredvals, 'all');
-    chistandarddev = std(chisquaredvals, 0, 'all');     % w = 0 to normalize by N-1 (default option)
+    chimean = mean(chisquaredvals, 'all','omitmissing');
+    chimedian = median(chisquaredvals, 'all','omitmissing');
+    chistandarddev = std(chisquaredvals, 0, 'all','omitmissing');     % w = 0 to normalize by N-1 (default option)
     
-    intmean = mean(intvals, 'all');
-    intmedian = median(intvals,'all');
-    intstandarddev = std(intvals,0,'all');
+    intmean = mean(intvals, 'all','omitmissing');
+    intmedian = median(intvals,'all','omitmissing');
+    intstandarddev = std(intvals,0,'all','omitmissing');
     
     
 
